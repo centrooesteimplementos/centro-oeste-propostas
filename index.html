@@ -668,60 +668,62 @@ const storage = {
   set: (key, val) => { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} },
 };
 
-// ============ GITHUB SYNC ============
-const ghSync = {
-  getConfig: () => ({
-    token: localStorage.getItem('gh_token') || '',
-    owner: localStorage.getItem('gh_owner') || '',
-    repo:  localStorage.getItem('gh_repo')  || '',
+// ============ JSONBIN SYNC ============
+const jbSync = {
+  BASE: 'https://api.jsonbin.io/v3',
+  getKey:   () => localStorage.getItem('jb_key')   || '',
+  getBinId: () => localStorage.getItem('jb_bin_id') || '',
+  setKey:   (k) => localStorage.setItem('jb_key', k),
+  setBinId: (id) => localStorage.setItem('jb_bin_id', id),
+  clearConfig: () => { ['jb_key','jb_bin_id'].forEach(k => localStorage.removeItem(k)); },
+  isConfigured: () => !!(jbSync.getKey()),
+  _headers: () => ({
+    'X-Master-Key': jbSync.getKey(),
+    'Content-Type': 'application/json',
   }),
-  setConfig: (token, owner, repo) => {
-    localStorage.setItem('gh_token', token);
-    localStorage.setItem('gh_owner', owner);
-    localStorage.setItem('gh_repo',  repo);
-  },
-  clearConfig: () => {
-    ['gh_token','gh_owner','gh_repo'].forEach(k => localStorage.removeItem(k));
-  },
-  isConfigured: () => {
-    const { token, owner, repo } = ghSync.getConfig();
-    return !!(token && owner && repo);
-  },
-  _headers: () => {
-    const { token } = ghSync.getConfig();
-    return { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' };
-  },
-  _url: () => {
-    const { owner, repo } = ghSync.getConfig();
-    return `https://api.github.com/repos/${owner}/${repo}/contents/data/proposals.json`;
+  // Cria um bin novo se não existir ainda
+  _ensureBin: async (payload) => {
+    if (jbSync.getBinId()) return jbSync.getBinId();
+    const resp = await fetch(`${jbSync.BASE}/b`, {
+      method: 'POST',
+      headers: { ...jbSync._headers(), 'X-Bin-Name': 'centro-oeste-propostas', 'X-Bin-Private': 'true' },
+      body: JSON.stringify(payload),
+    });
+    if (!resp.ok) throw new Error(`Erro ao criar bin: HTTP ${resp.status}`);
+    const data = await resp.json();
+    const id = data.metadata.id;
+    jbSync.setBinId(id);
+    return id;
   },
   load: async () => {
-    if (!ghSync.isConfigured()) return null;
+    if (!jbSync.isConfigured()) return null;
+    const binId = jbSync.getBinId();
+    if (!binId) return { proposals: [], sellers: null };
     try {
-      const resp = await fetch(ghSync._url(), { headers: ghSync._headers() });
-      if (resp.status === 404) return { proposals: [], sellers: null, sha: null };
+      const resp = await fetch(`${jbSync.BASE}/b/${binId}/latest`, { headers: jbSync._headers() });
+      if (resp.status === 404) return { proposals: [], sellers: null };
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       const data = await resp.json();
-      const content = JSON.parse(atob(data.content.replace(/\n/g, '')));
-      return { ...content, sha: data.sha };
+      return data.record;
     } catch(e) {
-      console.warn('GitHub load failed:', e);
+      console.warn('JSONBin load failed:', e);
       return null;
     }
   },
-  save: async (payload, sha) => {
-    if (!ghSync.isConfigured()) return null;
+  save: async (payload) => {
+    if (!jbSync.isConfigured()) return false;
     try {
-      const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
-      const body = { message: `sync: ${new Date().toISOString()}`, content: encoded };
-      if (sha) body.sha = sha;
-      const resp = await fetch(ghSync._url(), { method: 'PUT', headers: ghSync._headers(), body: JSON.stringify(body) });
+      const binId = await jbSync._ensureBin(payload);
+      const resp = await fetch(`${jbSync.BASE}/b/${binId}`, {
+        method: 'PUT',
+        headers: jbSync._headers(),
+        body: JSON.stringify(payload),
+      });
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-      const result = await resp.json();
-      return result.content.sha;
+      return true;
     } catch(e) {
-      console.warn('GitHub save failed:', e);
-      return null;
+      console.warn('JSONBin save failed:', e);
+      return false;
     }
   },
 };
@@ -1256,23 +1258,19 @@ function App() {
   const [showStatusModal, setShowStatusModal] = useState(null);
   const [logoB64, setLogoB64] = useState(LOGO_B64);
 
-  // GitHub Sync state
+  // JSONBin Sync state
   const [syncStatus, setSyncStatus] = useState('idle'); // idle | syncing | ok | error
   const [syncMsg, setSyncMsg] = useState('');
-  const [showGhConfig, setShowGhConfig] = useState(false);
-  const [ghToken, setGhToken] = useState(() => localStorage.getItem('gh_token') || '');
-  const [ghOwner, setGhOwner] = useState(() => localStorage.getItem('gh_owner') || 'centrooesteimplementos');
-  const [ghRepo, setGhRepo] = useState(() => localStorage.getItem('gh_repo') || 'centro-oeste-propostas');
-  const fileSha = useRef(null);
+  const [showJbConfig, setShowJbConfig] = useState(false);
+  const [jbKey, setJbKey] = useState(() => localStorage.getItem('jb_key') || '');
   const syncTimer = useRef(null);
 
-  // Load from GitHub on mount
+  // Carrega dados do JSONBin ao abrir
   useEffect(() => {
-    if (!ghSync.isConfigured()) return;
-    setSyncStatus('syncing'); setSyncMsg('Carregando do GitHub...');
-    ghSync.load().then(remote => {
+    if (!jbSync.isConfigured()) return;
+    setSyncStatus('syncing'); setSyncMsg('Carregando...');
+    jbSync.load().then(remote => {
       if (!remote) { setSyncStatus('error'); setSyncMsg('Falha ao carregar'); return; }
-      fileSha.current = remote.sha;
       if (remote.proposals && remote.proposals.length > 0) {
         setProposals(remote.proposals);
         storage.set('proposals', remote.proposals);
@@ -1285,29 +1283,28 @@ function App() {
     });
   }, []);
 
-  // Auto-sync proposals to GitHub with debounce
+  // Salva automaticamente no JSONBin com debounce de 2s
   const triggerSync = useCallback((p, s) => {
-    if (!ghSync.isConfigured()) return;
+    if (!jbSync.isConfigured()) return;
     clearTimeout(syncTimer.current);
     setSyncStatus('syncing'); setSyncMsg('Salvando...');
     syncTimer.current = setTimeout(async () => {
-      const newSha = await ghSync.save({ proposals: p, sellers: s }, fileSha.current);
-      if (newSha) { fileSha.current = newSha; setSyncStatus('ok'); setSyncMsg('Salvo no GitHub'); }
+      const ok = await jbSync.save({ proposals: p, sellers: s });
+      if (ok) { setSyncStatus('ok'); setSyncMsg('Salvo na nuvem'); }
       else { setSyncStatus('error'); setSyncMsg('Erro ao salvar'); }
-    }, 1500);
+    }, 2000);
   }, []);
 
   useEffect(() => { storage.set('sellers', sellers); }, [sellers]);
   useEffect(() => { storage.set('proposals', proposals); triggerSync(proposals, sellers); }, [proposals]);
   useEffect(() => { storage.set('currentSeller', currentSeller); }, [currentSeller]);
 
-  const saveGhConfig = () => {
-    ghSync.setConfig(ghToken.trim(), ghOwner.trim(), ghRepo.trim());
-    setShowGhConfig(false);
+  const saveJbConfig = () => {
+    jbSync.setKey(jbKey.trim());
+    setShowJbConfig(false);
     setSyncStatus('syncing'); setSyncMsg('Conectando...');
-    ghSync.load().then(remote => {
-      if (!remote) { setSyncStatus('error'); setSyncMsg('Token/repo inválido'); return; }
-      fileSha.current = remote.sha;
+    jbSync.load().then(remote => {
+      if (!remote) { setSyncStatus('error'); setSyncMsg('Chave inválida'); return; }
       if (remote.proposals && remote.proposals.length > 0) {
         setProposals(remote.proposals);
         storage.set('proposals', remote.proposals);
@@ -1317,10 +1314,10 @@ function App() {
   };
 
   const manualSync = async () => {
-    if (!ghSync.isConfigured()) { setShowGhConfig(true); return; }
+    if (!jbSync.isConfigured()) { setShowJbConfig(true); return; }
     setSyncStatus('syncing'); setSyncMsg('Sincronizando...');
-    const newSha = await ghSync.save({ proposals, sellers }, fileSha.current);
-    if (newSha) { fileSha.current = newSha; setSyncStatus('ok'); setSyncMsg('Sincronizado!'); }
+    const ok = await jbSync.save({ proposals, sellers });
+    if (ok) { setSyncStatus('ok'); setSyncMsg('Sincronizado!'); }
     else { setSyncStatus('error'); setSyncMsg('Erro ao sincronizar'); }
   };
 
@@ -1373,7 +1370,7 @@ function App() {
           <div className={`sync-btn ${syncStatus}`} onClick={manualSync} title={syncMsg || 'Clique para sincronizar com GitHub'}>
             {syncIcon} <span style={{maxWidth:120,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{syncMsg || (ghSync.isConfigured() ? 'GitHub' : 'Configurar sync')}</span>
           </div>
-          <div style={{cursor:'pointer',padding:'5px 8px',color:'#aaa',fontSize:16}} onClick={()=>setShowGhConfig(true)} title="Configurar GitHub">⚙</div>
+          <div style={{cursor:'pointer',padding:'5px 8px',color:'#aaa',fontSize:16}} onClick={()=>setShowJbConfig(true)} title="Configurar Sincronização">⚙</div>
           <div className="nav-seller" onClick={() => setCurrentSeller(null)}>
             <div className="nav-seller-icon">{currentSeller.initials}</div>
             <div className="nav-seller-name">{currentSeller.name.split(' ')[0]}</div>
@@ -1422,36 +1419,33 @@ function App() {
         </div>
       )}
 
-      {showGhConfig && (
-        <div className="modal-overlay" onClick={()=>setShowGhConfig(false)}>
+      {showJbConfig && (
+        <div className="modal-overlay" onClick={()=>setShowJbConfig(false)}>
           <div className="modal gh-modal" onClick={e=>e.stopPropagation()}>
-            <div className="modal-title">☁ Sincronização GitHub</div>
-            <p style={{fontSize:12,color:'#666',marginBottom:16,lineHeight:1.5}}>
-              As propostas serão salvas automaticamente em um repositório GitHub, permitindo acesso de qualquer dispositivo.
+            <div className="modal-title">☁ Sincronização na Nuvem</div>
+            <p style={{fontSize:12,color:'#666',marginBottom:16,lineHeight:1.6}}>
+              As propostas ficam salvas na nuvem e acessíveis de qualquer dispositivo ou navegador.
             </p>
-            <div style={{background:'#f0f7f0',border:'1px solid #c3dfc3',borderRadius:6,padding:'10px 14px',marginBottom:14,fontSize:12,color:'#2d6a2d'}}>
-              Repositório: <b>github.com/centrooesteimplementos/centro-oeste-propostas</b>
-            </div>
             <div className="gh-field">
-              <label>Token de Acesso Pessoal (PAT)</label>
-              <input type="password" value={ghToken} onChange={e=>setGhToken(e.target.value)}
-                placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autoFocus />
+              <label>Chave de API — JSONBin.io</label>
+              <input type="password" value={jbKey} onChange={e=>setJbKey(e.target.value)}
+                placeholder="$2a$10$xxxxxxxxxxxxxxxxxxxx" autoFocus />
               <div className="gh-help">
-                Gere em: <b>github.com</b> → Settings → Developer settings → Personal access tokens → Tokens (classic) → marque <b>repo</b>
+                Crie conta grátis em <b>jsonbin.io</b> → clique no ícone de chave (🔑) no menu → copie a <b>Master Key</b>
               </div>
             </div>
             <hr className="gh-divider" />
-            <div style={{fontSize:11,color:'#888',marginBottom:14}}>
-              O token fica salvo apenas neste navegador. Os dados ficam em <code>data/proposals.json</code> no repositório.
+            <div style={{fontSize:11,color:'#888',marginBottom:14,lineHeight:1.5}}>
+              A chave fica salva só neste navegador. Os dados ficam na nuvem do JSONBin e podem ser migrados para um servidor próprio futuramente.
             </div>
             <div className="btn-group">
-              <button className="btn btn-primary" onClick={saveGhConfig} disabled={!ghToken||!ghOwner||!ghRepo}>
+              <button className="btn btn-primary" onClick={saveJbConfig} disabled={!jbKey}>
                 Salvar e Conectar
               </button>
-              <button className="btn btn-outline" onClick={()=>{ ghSync.clearConfig(); setGhToken(''); setGhOwner(''); setGhRepo(''); setSyncStatus('idle'); setSyncMsg(''); setShowGhConfig(false); }}>
+              <button className="btn btn-outline" onClick={()=>{ jbSync.clearConfig(); setJbKey(''); setSyncStatus('idle'); setSyncMsg(''); setShowJbConfig(false); }}>
                 Desconectar
               </button>
-              <button className="btn btn-outline" onClick={()=>setShowGhConfig(false)}>Cancelar</button>
+              <button className="btn btn-outline" onClick={()=>setShowJbConfig(false)}>Cancelar</button>
             </div>
           </div>
         </div>
