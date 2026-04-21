@@ -1356,8 +1356,8 @@ function App() {
 
   const myProposals = proposals; // show all for admin view
 
-  const syncIcon = syncStatus === 'syncing' ? <span className="sync-spin">⟳</span>
-    : syncStatus === 'ok' ? '✓' : syncStatus === 'error' ? '✕' : '☁';
+  const syncIcon = syncStatus === 'syncing' ? <span className="sync-spin">&#x21BB;</span>
+    : syncStatus === 'ok' ? '\u2713' : syncStatus === 'error' ? '\u2715' : '\u2601';
 
   return (
     <div>
