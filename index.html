@@ -669,62 +669,74 @@ const storage = {
 };
 
 // ============ JSONBIN SYNC ============
+// Codigo = btoa(key + "|" + binId) — compartilhado entre dispositivos
 const jbSync = {
   BASE: 'https://api.jsonbin.io/v3',
-  getKey:   () => localStorage.getItem('jb_key')   || '',
-  getBinId: () => localStorage.getItem('jb_bin_id') || '',
-  setKey:   (k) => localStorage.setItem('jb_key', k),
-  setBinId: (id) => localStorage.setItem('jb_bin_id', id),
+  getKey:    () => localStorage.getItem('jb_key')    || '',
+  getBinId:  () => localStorage.getItem('jb_bin_id') || '',
+  setKey:    (k)  => localStorage.setItem('jb_key', k),
+  setBinId:  (id) => localStorage.setItem('jb_bin_id', id),
   clearConfig: () => { ['jb_key','jb_bin_id'].forEach(k => localStorage.removeItem(k)); },
-  isConfigured: () => !!(jbSync.getKey()),
+  isConfigured: () => !!(jbSync.getKey() && jbSync.getBinId()),
+
+  // Gera o codigo de compartilhamento (key|binId em base64)
+  getCodigo: () => {
+    const k = jbSync.getKey(), b = jbSync.getBinId();
+    if (!k || !b) return '';
+    return btoa(k + '|' + b);
+  },
+  // Decodifica o codigo e salva localmente
+  setCodigo: (codigo) => {
+    try {
+      const decoded = atob(codigo.trim());
+      const sep = decoded.lastIndexOf('|');
+      if (sep < 0) return false;
+      const key = decoded.slice(0, sep);
+      const binId = decoded.slice(sep + 1);
+      if (!key || !binId) return false;
+      jbSync.setKey(key);
+      jbSync.setBinId(binId);
+      return true;
+    } catch { return false; }
+  },
+
   _headers: () => ({
     'X-Master-Key': jbSync.getKey(),
     'Content-Type': 'application/json',
   }),
-  // Cria um bin novo se não existir ainda
-  _ensureBin: async (payload) => {
-    if (jbSync.getBinId()) return jbSync.getBinId();
+
+  // Cria bin na primeira vez e retorna o ID
+  createBin: async (payload) => {
     const resp = await fetch(`${jbSync.BASE}/b`, {
       method: 'POST',
       headers: { ...jbSync._headers(), 'X-Bin-Name': 'centro-oeste-propostas', 'X-Bin-Private': 'true' },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(payload || { proposals: [], sellers: [] }),
     });
-    if (!resp.ok) throw new Error(`Erro ao criar bin: HTTP ${resp.status}`);
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     const data = await resp.json();
-    const id = data.metadata.id;
-    jbSync.setBinId(id);
-    return id;
+    jbSync.setBinId(data.metadata.id);
+    return data.metadata.id;
   },
+
   load: async () => {
     if (!jbSync.isConfigured()) return null;
-    const binId = jbSync.getBinId();
-    if (!binId) return { proposals: [], sellers: null };
     try {
-      const resp = await fetch(`${jbSync.BASE}/b/${binId}/latest`, { headers: jbSync._headers() });
-      if (resp.status === 404) return { proposals: [], sellers: null };
+      const resp = await fetch(`${jbSync.BASE}/b/${jbSync.getBinId()}/latest`, { headers: jbSync._headers() });
+      if (resp.status === 404) return { proposals: [], sellers: [] };
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-      const data = await resp.json();
-      return data.record;
-    } catch(e) {
-      console.warn('JSONBin load failed:', e);
-      return null;
-    }
+      return (await resp.json()).record;
+    } catch(e) { console.warn('JSONBin load failed:', e); return null; }
   },
+
   save: async (payload) => {
     if (!jbSync.isConfigured()) return false;
     try {
-      const binId = await jbSync._ensureBin(payload);
-      const resp = await fetch(`${jbSync.BASE}/b/${binId}`, {
-        method: 'PUT',
-        headers: jbSync._headers(),
-        body: JSON.stringify(payload),
+      const resp = await fetch(`${jbSync.BASE}/b/${jbSync.getBinId()}`, {
+        method: 'PUT', headers: jbSync._headers(), body: JSON.stringify(payload),
       });
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       return true;
-    } catch(e) {
-      console.warn('JSONBin save failed:', e);
-      return false;
-    }
+    } catch(e) { console.warn('JSONBin save failed:', e); return false; }
   },
 };
 
@@ -1259,31 +1271,31 @@ function App() {
   const [logoB64, setLogoB64] = useState(LOGO_B64);
 
   // JSONBin Sync state
-  const [syncStatus, setSyncStatus] = useState('idle'); // idle | syncing | ok | error
-  const [syncMsg, setSyncMsg] = useState('');
+  const [syncStatus, setSyncStatus] = useState('idle');
+  const [syncMsg, setSyncMsg]       = useState('');
   const [showJbConfig, setShowJbConfig] = useState(false);
-  const [jbKey, setJbKey] = useState(() => localStorage.getItem('jb_key') || '');
+  const [jbKey, setJbKey]     = useState(() => localStorage.getItem('jb_key') || '');
+  const [jbCodigo, setJbCodigo] = useState('');
+  const [jbStep, setJbStep]   = useState('inicio'); // inicio | novo | existente | conectado
   const syncTimer = useRef(null);
 
-  // Carrega dados do JSONBin ao abrir
+  // Carrega dados ao abrir (se ja configurado)
   useEffect(() => {
     if (!jbSync.isConfigured()) return;
     setSyncStatus('syncing'); setSyncMsg('Carregando...');
     jbSync.load().then(remote => {
       if (!remote) { setSyncStatus('error'); setSyncMsg('Falha ao carregar'); return; }
       if (remote.proposals && remote.proposals.length > 0) {
-        setProposals(remote.proposals);
-        storage.set('proposals', remote.proposals);
+        setProposals(remote.proposals); storage.set('proposals', remote.proposals);
       }
       if (remote.sellers && remote.sellers.length > 0) {
-        setSellers(remote.sellers);
-        storage.set('sellers', remote.sellers);
+        setSellers(remote.sellers); storage.set('sellers', remote.sellers);
       }
       setSyncStatus('ok'); setSyncMsg('Sincronizado');
     });
   }, []);
 
-  // Salva automaticamente no JSONBin com debounce de 2s
+  // Salva no JSONBin com debounce de 2s
   const triggerSync = useCallback((p, s) => {
     if (!jbSync.isConfigured()) return;
     clearTimeout(syncTimer.current);
@@ -1291,7 +1303,7 @@ function App() {
     syncTimer.current = setTimeout(async () => {
       const ok = await jbSync.save({ proposals: p, sellers: s });
       if (ok) { setSyncStatus('ok'); setSyncMsg('Salvo na nuvem'); }
-      else { setSyncStatus('error'); setSyncMsg('Erro ao salvar'); }
+      else    { setSyncStatus('error'); setSyncMsg('Erro ao salvar'); }
     }, 2000);
   }, []);
 
@@ -1299,26 +1311,45 @@ function App() {
   useEffect(() => { storage.set('proposals', proposals); triggerSync(proposals, sellers); }, [proposals]);
   useEffect(() => { storage.set('currentSeller', currentSeller); }, [currentSeller]);
 
-  const saveJbConfig = () => {
+  // Cria um novo banco (primeiro dispositivo)
+  const criarNovoBanco = async () => {
+    if (!jbKey.trim()) return;
     jbSync.setKey(jbKey.trim());
-    setShowJbConfig(false);
+    setSyncStatus('syncing'); setSyncMsg('Criando banco...');
+    try {
+      await jbSync.createBin({ proposals, sellers });
+      const codigo = jbSync.getCodigo();
+      setJbCodigo(codigo);
+      setJbStep('conectado');
+      setSyncStatus('ok'); setSyncMsg('Banco criado!');
+    } catch(e) {
+      setSyncStatus('error'); setSyncMsg('Erro: verifique a chave API');
+    }
+  };
+
+  // Conecta com codigo existente (outros dispositivos)
+  const conectarCodigo = async () => {
+    if (!jbCodigo.trim()) return;
+    const ok = jbSync.setCodigo(jbCodigo.trim());
+    if (!ok) { setSyncStatus('error'); setSyncMsg('Codigo invalido'); return; }
+    setJbKey(jbSync.getKey());
     setSyncStatus('syncing'); setSyncMsg('Conectando...');
-    jbSync.load().then(remote => {
-      if (!remote) { setSyncStatus('error'); setSyncMsg('Chave inválida'); return; }
-      if (remote.proposals && remote.proposals.length > 0) {
-        setProposals(remote.proposals);
-        storage.set('proposals', remote.proposals);
-      }
-      setSyncStatus('ok'); setSyncMsg('Conectado!');
-    });
+    const remote = await jbSync.load();
+    if (!remote) { setSyncStatus('error'); setSyncMsg('Falha ao conectar'); return; }
+    if (remote.proposals && remote.proposals.length > 0) {
+      setProposals(remote.proposals); storage.set('proposals', remote.proposals);
+    }
+    setJbStep('conectado');
+    setSyncStatus('ok'); setSyncMsg('Conectado!');
+    setShowJbConfig(false);
   };
 
   const manualSync = async () => {
-    if (!jbSync.isConfigured()) { setShowJbConfig(true); return; }
+    if (!jbSync.isConfigured()) { setShowJbConfig(true); setJbStep('inicio'); return; }
     setSyncStatus('syncing'); setSyncMsg('Sincronizando...');
     const ok = await jbSync.save({ proposals, sellers });
     if (ok) { setSyncStatus('ok'); setSyncMsg('Sincronizado!'); }
-    else { setSyncStatus('error'); setSyncMsg('Erro ao sincronizar'); }
+    else    { setSyncStatus('error'); setSyncMsg('Erro'); }
   };
 
   const saveProposal = (p) => {
@@ -1422,31 +1453,89 @@ function App() {
       {showJbConfig && (
         <div className="modal-overlay" onClick={()=>setShowJbConfig(false)}>
           <div className="modal gh-modal" onClick={e=>e.stopPropagation()}>
-            <div className="modal-title">☁ Sincronização na Nuvem</div>
-            <p style={{fontSize:12,color:'#666',marginBottom:16,lineHeight:1.6}}>
-              As propostas ficam salvas na nuvem e acessíveis de qualquer dispositivo ou navegador.
-            </p>
-            <div className="gh-field">
-              <label>Chave de API — JSONBin.io</label>
-              <input type="password" value={jbKey} onChange={e=>setJbKey(e.target.value)}
-                placeholder="$2a$10$xxxxxxxxxxxxxxxxxxxx" autoFocus />
-              <div className="gh-help">
-                Crie conta grátis em <b>jsonbin.io</b> → clique no ícone de chave (🔑) no menu → copie a <b>Master Key</b>
+            <div className="modal-title">&#x2601; Sincronização na Nuvem</div>
+
+            {/* PASSO: INICIO */}
+            {jbStep === 'inicio' && (
+              <div>
+                <p style={{fontSize:13,color:'#555',marginBottom:20,lineHeight:1.6}}>
+                  Como deseja configurar a sincronização?
+                </p>
+                <div style={{display:'flex',flexDirection:'column',gap:10}}>
+                  <button className="btn btn-primary" onClick={()=>setJbStep('novo')}>
+                    Primeiro dispositivo — criar banco de dados
+                  </button>
+                  <button className="btn btn-outline" onClick={()=>setJbStep('existente')}>
+                    Já tenho o código — conectar ao banco existente
+                  </button>
+                </div>
+                <hr className="gh-divider"/>
+                <div className="btn-group"><button className="btn btn-outline" onClick={()=>setShowJbConfig(false)}>Cancelar</button></div>
               </div>
-            </div>
-            <hr className="gh-divider" />
-            <div style={{fontSize:11,color:'#888',marginBottom:14,lineHeight:1.5}}>
-              A chave fica salva só neste navegador. Os dados ficam na nuvem do JSONBin e podem ser migrados para um servidor próprio futuramente.
-            </div>
-            <div className="btn-group">
-              <button className="btn btn-primary" onClick={saveJbConfig} disabled={!jbKey}>
-                Salvar e Conectar
-              </button>
-              <button className="btn btn-outline" onClick={()=>{ jbSync.clearConfig(); setJbKey(''); setSyncStatus('idle'); setSyncMsg(''); setShowJbConfig(false); }}>
-                Desconectar
-              </button>
-              <button className="btn btn-outline" onClick={()=>setShowJbConfig(false)}>Cancelar</button>
-            </div>
+            )}
+
+            {/* PASSO: NOVO BANCO */}
+            {jbStep === 'novo' && (
+              <div>
+                <p style={{fontSize:12,color:'#666',marginBottom:14,lineHeight:1.6}}>
+                  Crie conta grátis em <b>jsonbin.io</b> → menu lateral → ícone de chave → copie a <b>Master Key</b>
+                </p>
+                <div className="gh-field">
+                  <label>Master Key do JSONBin</label>
+                  <input type="password" value={jbKey} onChange={e=>setJbKey(e.target.value)}
+                    placeholder="$2a$10$xxxxxxxxxxxxxxxxxxxx" autoFocus />
+                </div>
+                <div className="btn-group">
+                  <button className="btn btn-primary" onClick={criarNovoBanco} disabled={!jbKey}>Criar Banco</button>
+                  <button className="btn btn-outline" onClick={()=>setJbStep('inicio')}>Voltar</button>
+                </div>
+              </div>
+            )}
+
+            {/* PASSO: CONECTADO — mostra o codigo */}
+            {jbStep === 'conectado' && (
+              <div>
+                <div style={{background:'#eafaea',border:'1px solid #27ae60',borderRadius:8,padding:14,marginBottom:16}}>
+                  <div style={{fontSize:12,fontWeight:700,color:'#27ae60',marginBottom:6}}>BANCO CRIADO COM SUCESSO!</div>
+                  <div style={{fontSize:11,color:'#555',marginBottom:8}}>Copie este código e use nos outros dispositivos:</div>
+                  <div style={{background:'white',border:'1px solid #ccc',borderRadius:6,padding:'8px 10px',fontFamily:'monospace',fontSize:11,wordBreak:'break-all',userSelect:'all'}}>
+                    {jbSync.getCodigo()}
+                  </div>
+                  <button style={{marginTop:8,fontSize:11,padding:'4px 10px',background:'#27ae60',color:'white',border:'none',borderRadius:4,cursor:'pointer'}}
+                    onClick={()=>navigator.clipboard.writeText(jbSync.getCodigo())}>
+                    Copiar código
+                  </button>
+                </div>
+                <div className="btn-group"><button className="btn btn-primary" onClick={()=>setShowJbConfig(false)}>Fechar</button></div>
+              </div>
+            )}
+
+            {/* PASSO: CONECTAR COM CODIGO EXISTENTE */}
+            {jbStep === 'existente' && (
+              <div>
+                <p style={{fontSize:12,color:'#666',marginBottom:14,lineHeight:1.6}}>
+                  Cole o código gerado no primeiro dispositivo:
+                </p>
+                <div className="gh-field">
+                  <label>Código de Compartilhamento</label>
+                  <input value={jbCodigo} onChange={e=>setJbCodigo(e.target.value)}
+                    placeholder="Cole o código aqui..." autoFocus />
+                </div>
+                <div className="btn-group">
+                  <button className="btn btn-primary" onClick={conectarCodigo} disabled={!jbCodigo}>Conectar</button>
+                  <button className="btn btn-outline" onClick={()=>setJbStep('inicio')}>Voltar</button>
+                </div>
+              </div>
+            )}
+
+            {jbSync.isConfigured() && jbStep !== 'conectado' && (
+              <div style={{marginTop:12,textAlign:'center'}}>
+                <button style={{fontSize:11,color:'#e74c3c',background:'none',border:'none',cursor:'pointer'}}
+                  onClick={()=>{ jbSync.clearConfig(); setJbKey(''); setJbCodigo(''); setSyncStatus('idle'); setSyncMsg(''); setShowJbConfig(false); }}>
+                  Desconectar e limpar dados locais
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
