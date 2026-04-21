@@ -1368,7 +1368,7 @@ function App() {
         </div>
         <div style={{display:'flex',alignItems:'center',gap:4}}>
           <div className={`sync-btn ${syncStatus}`} onClick={manualSync} title={syncMsg || 'Clique para sincronizar com GitHub'}>
-            {syncIcon} <span style={{maxWidth:120,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{syncMsg || (ghSync.isConfigured() ? 'GitHub' : 'Configurar sync')}</span>
+            {syncIcon} <span style={{maxWidth:120,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{syncMsg || (jbSync.isConfigured() ? 'Nuvem' : 'Configurar sync')}</span>
           </div>
           <div style={{cursor:'pointer',padding:'5px 8px',color:'#aaa',fontSize:16}} onClick={()=>setShowJbConfig(true)} title="Configurar Sincronização">⚙</div>
           <div className="nav-seller" onClick={() => setCurrentSeller(null)}>
