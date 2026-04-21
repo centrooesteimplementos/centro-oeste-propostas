@@ -1,0 +1,19 @@
+# Configuração local com token GitHub (NUNCA suba isso)
+.gh_config.json
+
+# Backups locais
+backup/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Arquivo original com espaço no nome (use index.html)
+"centro_oeste_propostas (16).html"

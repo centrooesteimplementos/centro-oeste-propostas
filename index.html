@@ -1,0 +1,2587 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Centro Oeste Implementos - Propostas</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;800&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --verde: #2d6a2d;
+  --verde2: #3d8b3d;
+  --amarelo: #e8a020;
+  --amarelo2: #f5b82e;
+  --cinza: #1a1a1a;
+  --cinza2: #2c2c2c;
+  --cinza3: #3e3e3e;
+  --bg: #f0f0eb;
+  --bgcard: #ffffff;
+  --border: #d4d4c8;
+  --text: #1a1a1a;
+  --text2: #555;
+  --vermelho: #c0392b;
+  --azul: #2471a3;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Barlow', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* NAV */
+.nav { background: var(--cinza); color: white; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; height: 56px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+.nav-brand { display: flex; align-items: center; gap: 10px; }
+.nav-logo { height: 36px; width: auto; }
+.nav-title { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; line-height: 1.2; }
+.nav-title span { display: block; font-weight: 300; font-size: 11px; color: #aaa; letter-spacing: 1px; }
+.nav-seller { display: flex; align-items: center; gap: 8px; cursor: pointer; background: var(--cinza2); padding: 6px 10px; border-radius: 6px; border: 1px solid var(--cinza3); transition: all 0.2s; }
+.nav-seller:hover { background: var(--verde); border-color: var(--verde2); }
+.nav-seller-icon { width: 28px; height: 28px; background: var(--verde); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: white; }
+.nav-seller-name { font-size: 13px; font-weight: 600; }
+
+/* TABS */
+.tabs { background: var(--cinza2); display: flex; overflow-x: auto; border-bottom: 3px solid var(--verde); scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { padding: 12px 20px; font-size: 13px; font-weight: 600; color: #aaa; cursor: pointer; white-space: nowrap; border-bottom: 3px solid transparent; margin-bottom: -3px; transition: all 0.2s; letter-spacing: 0.5px; }
+.tab.active { color: var(--amarelo); border-bottom-color: var(--amarelo); }
+.tab:hover:not(.active) { color: white; }
+
+/* MAIN */
+.main { max-width: 900px; margin: 0 auto; padding: 16px; }
+
+/* CARDS */
+.card { background: var(--bgcard); border-radius: 10px; border: 1px solid var(--border); padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.card-title { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700; color: var(--verde); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.card-title::before { content: ''; width: 4px; height: 20px; background: var(--amarelo); border-radius: 2px; display: inline-block; }
+
+/* FORM */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } .form-grid.three { grid-template-columns: 1fr; } }
+.form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+.form-group { display: flex; flex-direction: column; gap: 4px; }
+.form-group.full { grid-column: 1 / -1; }
+label { font-size: 11px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; }
+input, select, textarea { width: 100%; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 14px; font-family: 'Barlow', sans-serif; background: white; color: var(--text); transition: border-color 0.2s; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--verde); }
+textarea { resize: vertical; min-height: 80px; }
+
+/* BUTTONS */
+.btn { padding: 10px 20px; border-radius: 7px; border: none; font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; letter-spacing: 0.3px; }
+.btn-primary { background: var(--verde); color: white; }
+.btn-primary:hover { background: var(--verde2); transform: translateY(-1px); box-shadow: 0 3px 8px rgba(45,106,45,0.3); }
+.btn-secondary { background: var(--amarelo); color: var(--cinza); }
+.btn-secondary:hover { background: var(--amarelo2); }
+.btn-danger { background: var(--vermelho); color: white; }
+.btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
+.btn-outline:hover { border-color: var(--verde); color: var(--verde); }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.btn-group { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+
+/* STATUS BADGES */
+.status { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.status-aguardando { background: #fff3cd; color: #856404; }
+.status-aceito { background: #d1e7dd; color: #0f5132; }
+.status-perdido { background: #f8d7da; color: #842029; }
+.status-desistencia { background: #e2e3e5; color: #41464b; }
+
+/* KPI CARDS */
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.kpi-card { background: var(--bgcard); border-radius: 10px; padding: 16px; border: 1px solid var(--border); border-left: 4px solid var(--verde); }
+.kpi-label { font-size: 10px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+.kpi-value { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 800; color: var(--cinza); }
+.kpi-sub { font-size: 11px; color: var(--text2); margin-top: 2px; }
+.kpi-card.amarelo { border-left-color: var(--amarelo); }
+.kpi-card.vermelho { border-left-color: var(--vermelho); }
+.kpi-card.azul { border-left-color: var(--azul); }
+
+/* PROPOSAL LIST */
+.proposal-item { background: var(--bgcard); border-radius: 8px; border: 1px solid var(--border); padding: 14px 16px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 12px; transition: box-shadow 0.2s; }
+.proposal-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.proposal-main { flex: 1; min-width: 0; }
+.proposal-num { font-size: 11px; color: var(--text2); font-weight: 600; }
+.proposal-client { font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.proposal-product { font-size: 13px; color: var(--text2); margin-top: 2px; }
+.proposal-meta { font-size: 11px; color: #999; margin-top: 4px; }
+.proposal-actions { display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
+
+/* PRODUCT CATALOG */
+.catalog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.catalog-item { border: 2px solid var(--border); border-radius: 8px; padding: 12px; cursor: pointer; transition: all 0.2s; background: white; }
+.catalog-item:hover, .catalog-item.selected { border-color: var(--verde); background: #f0f7f0; }
+.catalog-item.selected { border-width: 2.5px; }
+.catalog-cat { font-size: 10px; color: var(--amarelo); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.catalog-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.catalog-desc { font-size: 11px; color: var(--text2); line-height: 1.4; }
+.catalog-img { width: 100%; height: 80px; object-fit: cover; border-radius: 4px; margin-bottom: 8px; background: #eee; display: flex; align-items: center; justify-content: center; color: #aaa; font-size: 11px; }
+
+/* PAYMENT */
+.payment-type-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+.payment-chip { padding: 6px 14px; border-radius: 20px; border: 2px solid var(--border); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; background: white; }
+.payment-chip.active { border-color: var(--verde); background: #e8f5e8; color: var(--verde); }
+.installment-row { display: grid; grid-template-columns: auto 1fr 1fr 1fr; gap: 8px; align-items: center; margin-top: 8px; }
+
+/* SELLER LOGIN */
+.login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--cinza); padding: 20px; }
+.login-card { background: white; border-radius: 16px; padding: 40px; max-width: 480px; width: 100%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+.login-logo { height: 80px; margin-bottom: 20px; }
+.login-title { font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 800; color: var(--cinza); text-transform: uppercase; margin-bottom: 6px; }
+.login-sub { font-size: 14px; color: var(--text2); margin-bottom: 30px; }
+.seller-btn { width: 100%; padding: 14px; margin-bottom: 10px; background: var(--bg); border: 2px solid var(--border); border-radius: 8px; font-family: 'Barlow', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 12px; transition: all 0.2s; }
+.seller-btn:hover { border-color: var(--verde); background: #e8f5e8; color: var(--verde); }
+.seller-avatar { width: 38px; height: 38px; background: var(--verde); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 14px; flex-shrink: 0; }
+
+/* MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 16px; }
+.modal { background: white; border-radius: 12px; max-width: 500px; width: 100%; padding: 24px; max-height: 90vh; overflow-y: auto; }
+.modal-title { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 16px; text-transform: uppercase; color: var(--cinza); }
+
+/* DIVIDER */
+.divider { height: 1px; background: var(--border); margin: 16px 0; }
+.section-title { font-size: 13px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.8px; margin: 16px 0 10px; display: flex; align-items: center; gap: 6px; }
+.section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* FILTER */
+.filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; align-items: center; }
+.filter-bar input { flex: 1; min-width: 180px; }
+.filter-bar select { min-width: 140px; }
+
+/* EMPTY STATE */
+.empty { text-align: center; padding: 40px 20px; color: var(--text2); }
+.empty-icon { font-size: 40px; margin-bottom: 10px; }
+
+/* CHART BAR */
+.bar-chart { display: flex; flex-direction: column; gap: 8px; }
+.bar-row { display: flex; align-items: center; gap: 10px; }
+.bar-label { font-size: 12px; font-weight: 600; width: 120px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar-track { flex: 1; height: 20px; background: var(--border); border-radius: 4px; overflow: hidden; }
+.bar-fill { height: 100%; background: var(--verde); border-radius: 4px; transition: width 0.5s; }
+.bar-val { font-size: 12px; font-weight: 700; width: 30px; text-align: right; }
+
+/* BADGE NUM */
+.badge { background: var(--vermelho); color: white; border-radius: 10px; font-size: 10px; font-weight: 700; padding: 1px 6px; }
+
+/* PHOTO AREA */
+.photo-area { border: 2px dashed var(--border); border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.2s; }
+.photo-area:hover { border-color: var(--verde); }
+.photo-preview { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.photo-thumb { width: 80px; height: 80px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); }
+
+@media print { .no-print { display: none !important; } }
+
+/* SYNC STATUS */
+.sync-btn { display:flex; align-items:center; gap:6px; background:var(--cinza2); border:1px solid var(--cinza3); border-radius:6px; padding:5px 10px; cursor:pointer; font-size:12px; color:#aaa; transition:all 0.2s; margin-right:8px; }
+.sync-btn:hover { border-color:var(--verde); color:white; }
+.sync-btn.ok { border-color:#27ae60; color:#27ae60; }
+.sync-btn.error { border-color:#e74c3c; color:#e74c3c; }
+.sync-btn.syncing { border-color:var(--amarelo); color:var(--amarelo); }
+.sync-spin { display:inline-block; animation:spin 1s linear infinite; }
+@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+/* GH CONFIG MODAL */
+.gh-modal { max-width:420px; }
+.gh-field { margin-bottom:14px; }
+.gh-field label { display:block; font-size:12px; font-weight:600; color:#555; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.5px; }
+.gh-field input { width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:6px; font-size:13px; }
+.gh-field input:focus { outline:none; border-color:var(--verde); }
+.gh-help { font-size:11px; color:#888; margin-top:3px; }
+.gh-divider { border:none; border-top:1px solid var(--border); margin:16px 0; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+// ============ LOGO BASE64 ============
+const LOGO_B64 = "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";
+
+// ============ GTS CATALOG ============
+const GTS_IMG = "https://gtsdobrasil.ind.br/imagem/380/300/";
+const GTS_CATALOG = [
+  {
+    id: "produttiva", cat: "Plataforma de Milho", name: "Produttiva",
+    finame: "1404.20.10.00", ncm: "8433.59.90",
+    desc: "A plataforma líder em produtividade. Plataforma equilibrada com menor peso do mercado, otimizando consumo de diesel e sistema hidráulico da colheitadeira. Menor consumo de combustível. Fácil ajuste do deck despigador. As plataformas são equipadas de série com ajuste mecânico lateral. Alta disponibilidade de segurança com embreagens individuais linha a linha. Transmissão lateral banhada a óleo, com fechamento em alumínio, dissipando o calor e garantindo maior vida útil.",
+    img: GTS_IMG + "a2383-FOTO-PRINCIPAL-FULL--1---1-.jpg"
+  },
+  {
+    id: "vellox", cat: "Plataforma de Milho", name: "Vellox",
+    finame: "1404.20.10.00", ncm: "8433.59.90",
+    desc: "Sexta geração de plataformas GTS. Novo design de chassi reforçado, com montagens de 15 a 26 linhas e baixo índice de acúmulo de palha. Caracol bipartido com rolamento lateral. Exclusiva carenagem lateral elevada com curvatura. Sistema de embreagem individual linha a linha. Equipada com nova geração de banho a óleo. Exclusivo ajuste do ângulo de ataque pivotado.",
+    img: GTS_IMG + "5b63e-VELLOX-2.png"
+  },
+  {
+    id: "x10", cat: "Plataforma de Milho", name: "X10",
+    finame: "1404.20.10.00", ncm: "8433.59.90",
+    desc: "A única plataforma com estrutura de chassi 100% em alumínio  -  a mais leve do mercado, com melhor acabamento e durabilidade. Desenvolvida para alto rendimento, proporcionando velocidade de colheita e desempenho excepcional. Transmissão lateral fechada com banho a óleo de série. Caixas de transmissão em alumínio. Pode ser equipada com sensores de flutuação e direção.",
+    img: GTS_IMG + "60e57-b2354b08-8bd9-4ff5-b4ce-4c9093ce5173.jpg"
+  },
+  {
+    id: "flexer-xp", cat: "Plataforma de Corte", name: "Flexer XP",
+    finame: "1404.20.10.00", ncm: "8433.59.90",
+    desc: "Tecnologia e produtividade na medida certa. Copiamento de solo aliado ao melhor corte do mercado. Acoplamento para as principais marcas. Fácil ajuste mecânico do ângulo de corte. Estrutura de chassi em aço carbono. Sistema robusto com acionamento direto mecânico, dispensando motores e reservatórios hidráulicos. Maior range de copiamento do mercado. Molinetes Flip Over com giro em 360°.",
+    img: GTS_IMG + "1fe8d-FLEXER-PRIME-NO-CAMPO.png"
+  },
+  {
+    id: "flexer-xs", cat: "Plataforma de Corte", name: "Flexer XS",
+    finame: "1404.20.10.00", ncm: "8433.59.90",
+    desc: "A única plataforma do mundo com o chassi 100% em alumínio  -  leve e resistente. Três variações de velocidade de rotação das esteiras laterais através do acionamento por cardan e caixa de marchas com banho a óleo. Tecnologia draper de alta performance para colheita de soja, trigo e outros cereais com máxima eficiência.",
+    img: GTS_IMG + "9c54e-FLEXER-XP-FULL--1-_Easy-Resize.com.jpg"
+  },
+  {
+    id: "upgrain", cat: "Carreta Graneleira", name: "UpGrain",
+    finame: "8716.20.00.00", ncm: "8716.20.00",
+    desc: "Redução da quebra de grãos devido ao baixo contato mecânico. Disponível nas versões só grãos e multiuso. A linha UpGrain é estruturada com chapas de grande espessura e pintura altamente resistente. Sistema de descarga com alta vazão, chegando a mais de 200 sacas por minuto. Comporta hidráulica com regulagem de abertura/vazão. Formato diamante para melhor estabilidade.",
+    img: GTS_IMG + "93fed-WhatsApp-Image-2025-02-25-at-10.18.01-AM.jpeg"
+  },
+  {
+    id: "new-grann", cat: "Carreta Graneleira", name: "New Grann",
+    finame: "8716.20.00.00", ncm: "8716.20.00",
+    desc: "A melhor relação custo-benefício para a lavoura. Projeto compacto e design arrojado. Grande agilidade de deslocamento com estabilidade. Alta capacidade de descarga de grãos. Chassi super reforçado. Sistema de enlonamento simplificado com excelente vedação. Reservatório sem abas internas garantindo esgotamento total. Tubo de descarga de 400mm de diâmetro.",
+    img: GTS_IMG + "92fef-newgrann.jpeg"
+  },
+  {
+    id: "waggon-ed", cat: "Carreta Graneleira", name: "Waggon ED",
+    finame: "8716.20.00.00", ncm: "8716.20.00",
+    desc: "Carreta graneleira Waggon que estabelece novos padrões para transporte e descarga de grãos. Exclusivo sistema de sem-fim progressivo. Sistema de direcionador hidráulico para direcionamento vertical da descarga com uniformidade. Sem-fim progressivo que transporta grão por grão, reduzindo dano mecânico. Alta visibilidade e operação simples.",
+    img: GTS_IMG + "93fed-WhatsApp-Image-2025-02-25-at-10.18.01-AM.jpeg"
+  },
+  {
+    id: "waggon-s", cat: "Carreta Graneleira", name: "Waggon S",
+    finame: "8716.20.00.00", ncm: "8716.20.00",
+    desc: "Carreta graneleira Waggon S com estrutura simplificada e altamente resistente. Excelente custo-benefício para transporte de grãos. Design compacto para maior manobrabilidade.",
+    img: GTS_IMG + "c544a-GOD05328.jpg"
+  },
+  {
+    id: "big-grain", cat: "Carreta Graneleira", name: "Big Grain",
+    finame: "8716.20.00.00", ncm: "8716.20.00",
+    desc: "Carreta graneleira Big Grain para grandes capacidades de carga. Projetada para fazendas de alta produção com necessidade de transporte de grandes volumes de grãos. Alta resistência estrutural e sistema de descarga de alta vazão para máxima eficiência operacional.",
+    img: GTS_IMG + "38c0a-GOD05329.jpg"
+  },
+  {
+    id: "terrus-dxp", cat: "Descompactador", name: "Terrus DXP",
+    finame: "8432.80.90.00", ncm: "8432.80.90",
+    desc: "Descompactador Terrus DXP  -  manejo 2x mais robusto. Desenvolvido para as condições mais severas. Sistema exclusivo de desarme e rearme automático que protege de qualquer impacto. Sistema ampulheta com faca dorsal em aço forjado de altíssima qualidade. Pontas de alto carbono e discos com grande poder de corte exercendo 700 kg de pressão sobre o solo.",
+    img: GTS_IMG + "7f109-TERRUS-2.png"
+  },
+  {
+    id: "terrus-dxs", cat: "Descompactador", name: "Terrus DXS",
+    finame: "8432.80.90.00", ncm: "8432.80.90",
+    desc: "Manejo eficiente e econômico. Sistema de hastes com rearme automático  -  as hastes são equipadas com sistema exclusivo de desarme e rearme que protege de qualquer impacto, sendo automaticamente rearmado pelo sistema de molas com 3.175 Kgf de pressão. Sistema ampulheta com faca dorsal em aço forjado. Discos de corte que exercem 700 kg de pressão sobre o solo.",
+    img: GTS_IMG + "7f109-TERRUS-2.png"
+  },
+  {
+    id: "terrus-dsr", cat: "Descompactador", name: "Terrus DSR",
+    finame: "8432.80.90.00", ncm: "8432.80.90",
+    desc: "Descompactador Terrus DSR com sistema exclusivo para plantio direto. Compatível com o distribuidor Seeding para semeadura em cobertura. Alta eficiência na descompactação do solo com menor revolvimento superficial, mantendo a palhada e reduzindo erosão.",
+    img: GTS_IMG + "7f109-TERRUS-2.png"
+  },
+  {
+    id: "terrus-duo", cat: "Descompactador", name: "Terrus Duo",
+    finame: "8432.80.90.00", ncm: "8432.80.90",
+    desc: "Manejo 2x mais robusto. Desenvolvido para as condições mais severas, mesmo com solo extremamente seco. Sistema de desarme automático e rearme semiautomático. Hastes e disco de corte desencontrados que otimizam a vazão de palha. Profundidade de trabalho entre 30 a 40 cm. Rolos destorroadores com molas parabólicas.",
+    img: GTS_IMG + "7b5ed-TERRUS-DUO-1.png"
+  },
+  {
+    id: "fertti", cat: "Corretor de Solo", name: "Fertti",
+    finame: "8432.42.00.00", ncm: "8432.42.00",
+    desc: "Se o fertilizante é o comprimido, o Fertti é a injeção! Proporciona ganho expressivo de produtividade graças à distribuição uniforme dentro da área descompactada. Menor revolvimento superficial, mantendo cobertura do solo. Os corretivos são aplicados ao longo da haste descompactadora em 3 faixas, utilizando sistema de pressão de ar.",
+    img: GTS_IMG + "8928c-fertti2.jpeg"
+  },
+  {
+    id: "tiller", cat: "Nivelador Triturador", name: "Tiller Bravus",
+    finame: "8432.80.90.00", ncm: "8432.80.90",
+    desc: "3 em 1: Tritura, incorpora e nivela. Disponível de 20 a 35 pés. Regularização da superfície do solo e manejo da palhada. Adapta-se às ondulações do terreno. Trabalha em alta velocidade (12 a 20km/h). Articulação dos módulos. Rolo destorroador robusto com 600mm de diâmetro. Reduz índices de erosão pela manutenção da palhada.",
+    img: GTS_IMG + "c6349-52AB7736-00C7-46D0-B179-6F730C6091A2.jpeg"
+  },
+  {
+    id: "seeding", cat: "Distribuidor", name: "Seeding",
+    finame: "8432.31.00.00", ncm: "8432.31.00",
+    desc: "Um novo conceito em Cover Crop Seed. Compatível com toda a linha DSR e possibilidade para DXS. Distribuição de sementes por gravidade, sem necessidade de sistema de ar. Sistema pantográfico sem necessidade da plataforma. Ideal para semear sementes finas, grossas e mix de culturas. Permite adicionar mais uma cultura na lavoura.",
+    img: GTS_IMG + "0d512-TERRUS-SEEDING-NO-CAMPO.png"
+  },
+  {
+    id: "planner-310-hd", cat: "Sistematização de Solo", name: "Planner 310 HD",
+    finame: "8432.80.90.00", ncm: "8432.80.90",
+    desc: "Aliada do produtor para manter a operação nos períodos de entressafra. Todas as funções hidráulicas de levante, ângulo e inclinação da lâmina com apenas dois comandos. Eficiente e econômica. Corte eficaz e grande vazão de terra. Customizável com lâmina de 3,65 ou 4,24 metros. Baixa manutenção com lâmina de alta performance igual às motoniveladoras.",
+    img: GTS_IMG + "a0558-03--1-.jpg"
+  },
+  {
+    id: "planner-310-ct", cat: "Sistematização de Solo", name: "Planner 310 CT",
+    finame: "8432.80.90.00", ncm: "8432.80.90",
+    desc: "Planner 310 CT  -  solução ideal para construtoras e terraplanagem rural. Sistematização e construção de terraços com alta versatilidade. Compatível com tratores de baixa potência. Sistema hidráulico eficiente para nivelamento preciso.",
+    img: GTS_IMG + "ca507-04--1-.jpg"
+  },
+  {
+    id: "planner-510", cat: "Sistematização de Solo", name: "Planner 510 Construction",
+    finame: "8432.80.90.00", ncm: "8432.80.90",
+    desc: "Tecnologia para enfrentar diversas operações. Levante de 90cm, maior inclinação e maior ângulo de lâmina (28/62°). Maior vão livre devido ao eixo e pneus. Estrutura modulada com mancais de proteção. Capacidade superior para sistematização de grandes áreas com máxima eficiência.",
+    img: GTS_IMG + "e8ba3-02--1-.jpg"
+  },
+  {
+    id: "planner-710-canavieira", cat: "Sistematização de Solo", name: "Planner 710 Canavieira",
+    finame: "8432.80.90.00", ncm: "8432.80.90",
+    desc: "Planner 710 Canavieira especialmente desenvolvido para a cultura da cana-de-açúcar. Oferece todas as funções de uma motoniveladora com excelente custo-benefício. Baixo custo de manutenção e alto rendimento. Compatível com tratores de 100 a 250cv.",
+    img: GTS_IMG + "ece0a-01.jpg"
+  },
+  {
+    id: "planner-710-construction", cat: "Sistematização de Solo", name: "Planner 710 Construction",
+    finame: "8432.80.90.00", ncm: "8432.80.90",
+    desc: "Enfrenta qualquer terreno com eficiência. Oferece todas as funções de uma motoniveladora com excelente custo-benefício. Baixo custo de manutenção e alto rendimento. Compatibilidade com todos os tratores na faixa de potência exigida (100 a 250cv).",
+    img: GTS_IMG + "a0558-03--1-.jpg"
+  },
+  {
+    id: "exattus", cat: "Semeadora", name: "Exattus",
+    finame: "8432.31.00.00", ncm: "8432.31.00",
+    desc: "A revolução da agricultura nos cerrados. Adicione mais uma cultura na lavoura e maximize sua rentabilidade. Projeto inédito para semeadura na entrelinha do milho. Ágil e versátil, com espaçamentos de 45 a 90cm. Perfeita distribuição de sementes por indução de ar, com economia de até 75% por área plantada. Trabalha em alta velocidade: 15km/h.",
+    img: GTS_IMG + "69fd1-GOD05419.jpg"
+  },
+];
+
+// ============ CATÁLOGO JAN ============
+const JAN_IMG = "https://www.jan.com.br/source/produto/imagem/";
+const JAN_CATALOG = [
+  // --- DISTRIBUIDORES DE FERTILIZANTES ---
+  { id:"jan-lancer-1350", brand:"Jan", cat:"Distribuidor de Fertilizantes", name:"Lancer 1.350",
+    finame:"", ncm:"8432.42.00",
+    desc:"Distribuidor de fertilizantes com sistema de dupla dosagem de fluxo (normal/fina) para regulagem de pequenas e grandes taxas de aplicação. Capacidade de 1,35 m³ / 1.350 kg. Largura de distribuição de até 36 m. Discos em aço inox. Engate três pontos categoria II. 540 rpm.",
+    img: JAN_IMG + "1597326630943.webp" },
+  { id:"jan-lancer-master-1200", brand:"Jan", cat:"Distribuidor de Fertilizantes", name:"Lancer Master 1.200",
+    finame:"", ncm:"8432.42.00",
+    desc:"Distribuidor Lancer Master 1.200 para distribuição de fertilizantes de cobertura, pré-plantio e sementes. Largura de distribuição de 12 a 36 m (regulável). Capacidade 1,20 m³ / 1.200 kg. Comportas hidráulicas, discos e palhetas em inox. Engate três pontos Cat. II.",
+    img: JAN_IMG + "1599827280669.webp" },
+  { id:"jan-lancer-master-1500", brand:"Jan", cat:"Distribuidor de Fertilizantes", name:"Lancer Master 1.500",
+    finame:"", ncm:"8432.42.00",
+    desc:"Distribuidor Lancer Master 1.500 para distribuição de fertilizantes de cobertura, pré-plantio e sementes. Largura de distribuição de 12 a 36 m (regulável). Capacidade 1,50 m³ / 1.500 kg. Comportas hidráulicas, discos e palhetas em inox. Engate três pontos Cat. II.",
+    img: JAN_IMG + "1599827280669.webp" },
+  { id:"jan-lancer-4500", brand:"Jan", cat:"Distribuidor de Fertilizantes", name:"Lancer 4.500",
+    finame:"", ncm:"8432.42.00",
+    desc:"Distribuidor de fertilizantes Lancer 4.500 com esteira de travessas. Capacidade 2,50 m³ / 4.500 kg. Largura de distribuição de 6 a 25 m. Potência requerida: 70 a 85 cv. Acoplamento por barra de tração. 540 rpm.",
+    img: JAN_IMG + "1744218760-lancer-6-500-png.png" },
+  { id:"jan-lancer-6500", brand:"Jan", cat:"Distribuidor de Fertilizantes", name:"Lancer 6.500",
+    finame:"", ncm:"8432.42.00",
+    desc:"Distribuidor Lancer 6.500 com esteira de travessas. Capacidade 3,20 m³ / 6.500 kg. Largura de distribuição de 6 a 25 m. Potência requerida: 70 a 85 cv. Eixo e conjunto tandem desmontáveis. 540 rpm.",
+    img: JAN_IMG + "1744218760-lancer-6-500-png.png" },
+  { id:"jan-lancer-7500-th-inox", brand:"Jan", cat:"Distribuidor de Fertilizantes", name:"Lancer 7.500 TH Inox",
+    finame:"", ncm:"8432.42.00",
+    desc:"Distribuidor Lancer 7.500 TH Inox com esteira modulada em aço inoxidável reforçada. Capacidade 4,25 m³ / 7.500 kg. Acionamento hidráulico. Largura de distribuição de 6 a 25 m. Depósito, esteira, discos e componentes em contato com produto fabricados em aço inox.",
+    img: JAN_IMG + "1744218760-lancer-6-500-png.png" },
+  { id:"jan-lancer-12000-multiuso", brand:"Jan", cat:"Distribuidor Multiuso", name:"Lancer Multiuso 12.000 TM",
+    finame:"", ncm:"8432.42.00",
+    desc:"Distribuidor versátil para calcário úmido ou seco, fertilizantes orgânicos, gesso, fertilizantes granulares e sementes. Capacidade 6,00 m³ / 12.000 kg. Transmissão mecânica com 5 combinações de velocidade. Largura de distribuição até 36 m. Potência requerida: 110 cv. Compatible com taxa variável SMART JAN.",
+    img: JAN_IMG + "1599766631614.webp" },
+  // --- DISTRIBUIDORES MAGNU ---
+  { id:"jan-lancer-magnu-10000", brand:"Jan", cat:"Distribuidor Magnu", name:"Lancer Magnu 10.000",
+    finame:"", ncm:"8432.42.00",
+    desc:"Distribuidor robusto para aplicação de calcário úmido ou seco, gesso, sementes, fertilizantes orgânicos, cama de aviário, casca de café. Capacidade 5 m³ / 10.000 kg. Potência requerida: 100 cv. Largura 6 a 25 m. Esteira de travessas (padrão) ou modular inox (opcional).",
+    img: JAN_IMG + "1745408975-lancer-magnu-10000-th-carbono~1-webp.webp" },
+  { id:"jan-lancer-magnu-10000-plus", brand:"Jan", cat:"Distribuidor Magnu", name:"Lancer Magnu 10.000 Plus",
+    finame:"", ncm:"8432.42.00",
+    desc:"Distribuidor Lancer Magnu 10.000 Plus com esteira de borracha tipo correia transportadora de alta abrasão com fios de poliéster. Sistema de gotejamento para lubrificação. Capacidade 5 m³ / 10.000 kg. 100 cv. Distribuição de 6 a 25 m.",
+    img: JAN_IMG + "1745408975-lancer-magnu-10000-th-carbono~1-webp.webp" },
+  { id:"jan-lancer-magnu-10000-plus-th", brand:"Jan", cat:"Distribuidor Magnu", name:"Lancer Magnu 10.000 Plus TH",
+    finame:"", ncm:"8432.42.00",
+    desc:"Versão hidráulica do Lancer Magnu 10.000 Plus. Acionamento da esteira e dos discos via motores hidráulicos. Capacidade 5 m³ / 10.000 kg. Compatible com taxa variável SMART JAN. 100 cv. Largura 6 a 25 m.",
+    img: JAN_IMG + "1745408975-lancer-magnu-10000-th-carbono~1-webp.webp" },
+  { id:"jan-lancer-magnu-20000", brand:"Jan", cat:"Distribuidor Magnu", name:"Lancer Magnu 20.000",
+    finame:"", ncm:"8432.42.00",
+    desc:"Distribuidor de grande capacidade Lancer Magnu 20.000. Capacidade 10 m³ / 20.000 kg. Potência 120 a 140 cv. Largura de distribuição 6 a 25 m. Rodado com pneu 18.4-30 TM ou 23.1-26 MB.",
+    img: JAN_IMG + "1745408975-lancer-magnu-10000-th-carbono~1-webp.webp" },
+  // --- DISTRIBUIDORES MAXIMUS ---
+  { id:"jan-maximus-8000-th", brand:"Jan", cat:"Distribuidor Maximus", name:"Lancer Maximus 8.000 TH Inox",
+    finame:"", ncm:"8432.42.00",
+    desc:"Distribuidor Lancer Maximus 8.000 TH Inox com esteira tipo cassete em borracha de alta abrasão. Capacidade 4 m³ / 8.000 kg. Transmissão hidráulica independente. Largura até 36 m. Potência 80 a 95 cv. Materiais em contato com o produto em aço inox.",
+    img: JAN_IMG + "1742998998-dsc06350-enhanced-nr-webp.webp" },
+  { id:"jan-maximus-12000-th", brand:"Jan", cat:"Distribuidor Maximus", name:"Lancer Maximus 12.000 TH Inox",
+    finame:"", ncm:"8432.42.00",
+    desc:"Distribuidor Lancer Maximus 12.000 TH Inox com bomba dupla para acionamento independente da esteira e dos discos. Capacidade 6 m³ / 12.000 kg. Largura até 36 m. Potência 110 cv. Kit taxa variável SMART JAN. Bitola regulável 1.800 a 3.200 mm.",
+    img: JAN_IMG + "1742998998-dsc06350-enhanced-nr-webp.webp" },
+  { id:"jan-maximus-12000-plus", brand:"Jan", cat:"Distribuidor Maximus", name:"Lancer Maximus 12.000 Plus TH",
+    finame:"", ncm:"8432.42.00",
+    desc:"Distribuidor Lancer Maximus 12.000 Plus TH com reservatório em aço inox e esteira de borracha de alta abrasão com rolos cônicos centralizadores. Capacidade 6 m³ / 12.000 kg. 120 cv. Largura até 40 m. Comportas de corte hidráulicas, taxa variável SMART JAN.",
+    img: JAN_IMG + "1742998837-rec-lmx-12-000-plus-th-frente-webp.webp" },
+  { id:"jan-maximus-25000-th", brand:"Jan", cat:"Distribuidor Maximus", name:"Lancer Maximus 25.000 TH Inox",
+    finame:"", ncm:"8432.42.00",
+    desc:"Distribuidor de grande porte Lancer Maximus 25.000 TH Inox em aço inox. Capacidade 12 m³ / 24.000 kg. 140 a 180 cv. Largura até 36 m. Possibilidade de montagem em caminhão. Pneus de alta flutuação 710/40x22.5.",
+    img: JAN_IMG + "1742998998-dsc06350-enhanced-nr-webp.webp" },
+  { id:"jan-maximus-32000-th", brand:"Jan", cat:"Distribuidor Maximus", name:"Lancer Maximus 32.000 TH Inox",
+    finame:"", ncm:"8432.42.00",
+    desc:"Maior distribuidor da linha Maximus. Capacidade 16 m³ / 32.000 kg. Acima de 180 cv. Largura até 36 m. Construído totalmente em inox. Possibilidade de montagem em caminhão. Pneus 23.1-26 e 30.5-32.",
+    img: JAN_IMG + "1742998998-dsc06350-enhanced-nr-webp.webp" },
+  // --- DISTRIBUIDORES ORGÂNICOS ---
+  { id:"jan-lancer-organico-3000", brand:"Jan", cat:"Distribuidor Orgânico", name:"Lancer Orgânico 3.000",
+    finame:"", ncm:"8432.42.00",
+    desc:"Distribuidor orgânico para esterco bovino, frango, suíno, calcário, gesso e torta de filtro. Capacidade 1,6 m³ / 3.000 kg. 40 a 80 cv. Largura de distribuição 10 a 16 m. Esteira dupla 80 cm, 540 rpm. Sistema de transmissão mecânico (TM).",
+    img: JAN_IMG + "1599670425963.webp" },
+  { id:"jan-lancer-organico-6000", brand:"Jan", cat:"Distribuidor Orgânico", name:"Lancer Orgânico 6.000",
+    finame:"", ncm:"8432.42.00",
+    desc:"Distribuidor orgânico Lancer 6.000 para fertilizantes orgânicos. Capacidade 3 m³ / 6.000 kg. 80 a 95 cv. Largura 10 a 16 m. Esteira dupla de 80 cm. Dois funis: separador standard (orgânicos) e funil calcário/gesso.",
+    img: JAN_IMG + "1599670425963.webp" },
+  { id:"jan-lancer-organico-8000-th", brand:"Jan", cat:"Distribuidor Orgânico", name:"Lancer Orgânico 8.000 TH",
+    finame:"", ncm:"8432.42.00",
+    desc:"Distribuidor orgânico hidráulico Lancer 8.000 TH. Capacidade 4 m³ / 8.000 kg. 95 a 110 cv. Largura 10 a 16 m. Acionamento da esteira e dos discos por motores hidráulicos. Vazão mínima de óleo 50 Lpm.",
+    img: JAN_IMG + "1599670425963.webp" },
+  { id:"jan-lancer-organico-12000-th", brand:"Jan", cat:"Distribuidor Orgânico", name:"Lancer Orgânico 12.000 TH",
+    finame:"", ncm:"8432.42.00",
+    desc:"Maior modelo da linha orgânica. Capacidade 6 m³ / 12.000 kg. 95 a 110 cv. Largura 10 a 16 m. Acionamento hidráulico da esteira e dos discos. Dois discos com quatro palhetas retas e quatro opções de regulagem angular. Vazão mínima 55 Lpm.",
+    img: JAN_IMG + "1599670425963.webp" },
+  // --- DISTRIBUIDOR SÊMEA ---
+  { id:"jan-lancer-semea-3000", brand:"Jan", cat:"Distribuidor de Sementes", name:"Lancer Sêmea 3.000",
+    finame:"", ncm:"8432.42.00",
+    desc:"Distribuidor Sêmea 3.000 para fertilizantes de cobertura, pré-plantio e sementes. Sistema de dupla dosagem de fluxo (normal/fina). Comportas bipartidas com controle hidráulico. Discos em aço inox. Capacidade 3 m³ / 3.000 kg. Largura 12, 24, 28 e 36 m. 90 cv. 540 rpm.",
+    img: JAN_IMG + "1608060739712.webp" },
+  { id:"jan-lancer-semea-5000", brand:"Jan", cat:"Distribuidor de Sementes", name:"Lancer Sêmea 5.000",
+    finame:"", ncm:"8432.42.00",
+    desc:"Distribuidor Sêmea 5.000 com sistema de dupla dosagem de fluxo. Comportas bipartidas com controle hidráulico de abertura. Discos em aço inox. Capacidade 5 m³ / 5.000 kg. Largura 12, 24, 28 e 36 m. 100 cv.",
+    img: JAN_IMG + "1608060739712.webp" },
+  // --- LÍNEA ---
+  { id:"jan-linea-6000", brand:"Jan", cat:"Distribuição Localizada", name:"Línea 6.000",
+    finame:"", ncm:"8432.42.00",
+    desc:"Dispositivo para aplicação de produto seco por gravidade, com distribuição localizada. Largura útil 6 m. Acoplável aos distribuidores Lancer 4.500, 6.500, 7.500, Magnu, Magnu Plus e Multiuso. Precisão no perfil transversal, sem sobreposição, diminui a deriva. 540 rpm.",
+    img: JAN_IMG + "1607454527927.webp" },
+  { id:"jan-linea-8000", brand:"Jan", cat:"Distribuição Localizada", name:"Línea 8.000 TM/TH",
+    finame:"", ncm:"8432.42.00",
+    desc:"Dispositivo para aplicação localizada de produto seco por gravidade, largura útil 8 m. Acoplável à linha Lancer Maximus 12.000, 20.000 e 25.000 TH/TM. 48 furos de saída, distância entre furos 125 mm. Peso aproximado 744 kg.",
+    img: JAN_IMG + "1607454527927.webp" },
+  // --- DISTRIBUIDOR AUTOPROPELIDO ---
+  { id:"jan-power-lancer-4000", brand:"Jan", cat:"Distribuidor Autopropelido", name:"Power Lancer 4.000 4x4",
+    finame:"", ncm:"8432.42.00",
+    desc:"Distribuidor de fertilizantes autopropelido com tração mecânica 4x4 bidirecional. Motor MWM 160 cv. Capacidade 4 m³ / 4.000 kg. Largura de distribuição até 36 m. Bitola regulável 2.700 a 3.200 mm. Vão livre 1.420 mm. Piloto automático hidráulico. Kit taxa variável SMART JAN.",
+    img: JAN_IMG + "1708698066421.webp" },
+  // --- PULVERIZADORES ---
+  { id:"jan-power-jet-2000", brand:"Jan", cat:"Pulverizador Autopropelido", name:"Power Jet 2.000 4x4",
+    finame:"", ncm:"8432.41.00",
+    desc:"Pulverizador autopropelido Power Jet 2.000 4x4 com transmissão mecânica. Motor MWM 130 cv. Tanque 2.000 L em polietileno. Barras 25 m (27 m opcional). Bomba UDOR 170 L/min. Computador Smart Jan 8pol. Comando eletrônico 7 seções. Suspensão pneumática independente. Tração 4x4 diferencial Dana 80.",
+    img: JAN_IMG + "1744313906-1707851131961-webp.webp" },
+  { id:"jan-power-jet-2650", brand:"Jan", cat:"Pulverizador Autopropelido", name:"Power Jet 2.650 4x4",
+    finame:"", ncm:"8432.41.00",
+    desc:"Pulverizador autopropelido Power Jet 2.650 4x4 bidirecional. Motor MWM 160 cv eletrônico. Tanque 2.650 L. Barras 25 m (27/30 m opcionais). Baixo consumo 10 a 12 L/h. Direção hidrostática bidirecional. Suspensão pneumática ativa independente. Raio de giro 5,76 m.",
+    img: JAN_IMG + "1744313796-1734619408456-webp.webp" },
+  // --- PLATAFORMA DE MILHO ---
+  { id:"jan-supra-4100", brand:"Jan", cat:"Plataforma de Milho", name:"Plataforma Supra 4.100 (7/8 linhas)",
+    finame:"", ncm:"8433.91.00",
+    desc:"Plataforma de milho Supra 4.100  -  7 linhas (50 cm) ou 8 linhas (45 cm). Largura total 4,5 m. Chassi monobloco em chapa de alta resistência, ângulo de trabalho 16°. Caracol com passo constante 660 mm e catraca radial. Linha de colheita com corrente recolhedora e sistema de esticamento com mola pré-tensionada.",
+    img: JAN_IMG + "1599758272339.webp" },
+  { id:"jan-supra-6000", brand:"Jan", cat:"Plataforma de Milho", name:"Plataforma Supra 6.000 (12/13 linhas)",
+    finame:"", ncm:"8433.91.00",
+    desc:"Plataforma de milho Supra 6.000  -  12 linhas (50 cm) ou 13 linhas (45 cm). Largura total 6,5 m. Caracol bipartido com dupla mancalização central. Divisores laterais com perfis estreitos e regulagem para acompanhar a última linha.",
+    img: JAN_IMG + "1599758272339.webp" },
+  { id:"jan-supra-8300", brand:"Jan", cat:"Plataforma de Milho", name:"Plataforma Supra 8.300 (18 linhas)",
+    finame:"", ncm:"8433.91.00",
+    desc:"Plataforma de milho Supra 8.300  -  17 linhas (50 cm) ou 18 linhas (45 cm). Largura total 9 m. Peso aproximado 3.790 kg. Transmissão lateral com corrente ASA 80H, caixa em alumínio fundido.",
+    img: JAN_IMG + "1599758272339.webp" },
+  { id:"jan-supra-10800", brand:"Jan", cat:"Plataforma de Milho", name:"Plataforma Supra 10.800 (22/24 linhas)",
+    finame:"", ncm:"8433.91.00",
+    desc:"Plataforma de milho Supra 10.800  -  22 linhas (50 cm) ou 24 linhas (45 cm). Largura total 11,2 m. Caracol bipartido com dupla mancalização. Adaptação para diferentes marcas de colhedoras.",
+    img: JAN_IMG + "1599758272339.webp" },
+  // --- PLANTADORA ---
+  { id:"jan-sniper-mecanica", brand:"Jan", cat:"Plantadora de Grãos", name:"Sniper Mecânica",
+    finame:"", ncm:"8432.31.00",
+    desc:"Plantadora de grãos graúdos (soja, milho, feijão) em plantio direto. Configurações: 9, 10, 11, 12, 17 e 20 linhas. Distribuidor TOPlanting X3 exclusivo. Sistema de catraca para curvas. Rodado duplo com paralelogramo de articulações desuniforme. Disco de corte 20 polegadas. Buchas autolubrificantes.",
+    img: JAN_IMG + "1706272580911.webp" },
+  { id:"jan-sniper-pneumatica", brand:"Jan", cat:"Plantadora de Grãos", name:"Sniper Pneumática",
+    finame:"", ncm:"8432.31.00",
+    desc:"Plantadora pneumática de grãos graúdos. Configurações: 10, 11, 12, 17 e 34 linhas. Dosador pneumático via pressão negativa de turbina. Máxima precisão no espaçamento entre sementes. Compactadores com articulação e pressão independente. Rolamentos blindados.",
+    img: JAN_IMG + "1706272580911.webp" },
+  // --- ESCARIFICADORES ---
+  { id:"jan-esc-matic-7", brand:"Jan", cat:"Escarificador", name:"Escarificador Matic 7 Braços",
+    finame:"", ncm:"8432.10.00",
+    desc:"Escarificador Matic 7 braços. Largura de trabalho 2.100 mm. Profundidade 20 a 300 mm. Disco de corte liso 20pol. Sistema de segurança com desarme e rearme automático por mola plana. Rolo destorroador com mancais em banho de óleo. Potência 12-15 cv/braço. Rendimento 0,80 a 1,30 ha/h.",
+    img: JAN_IMG + "1599747915916.webp" },
+  { id:"jan-esc-matic-11", brand:"Jan", cat:"Escarificador", name:"Escarificador Matic 11 Braços",
+    finame:"", ncm:"8432.10.00",
+    desc:"Escarificador Matic 11 braços. Largura de trabalho 3.300 mm. Profundidade 20 a 300 mm. Disco de corte liso 20pol. Sistema de segurança com desarme e rearme automático. Rolo destorroador. Potência 12-15 cv/braço. Rendimento 1,30 a 2,00 ha/h.",
+    img: JAN_IMG + "1599747915916.webp" },
+  { id:"jan-esc-matic-15", brand:"Jan", cat:"Escarificador", name:"Escarificador Matic 15 Braços",
+    finame:"", ncm:"8432.10.00",
+    desc:"Escarificador Matic 15 braços. Largura de trabalho 4.500 mm. Profundidade 20 a 300 mm. Disco de corte liso 20pol. Sistema de segurança com desarme e rearme automático. Pneu RA 28 10.5/65-16. Peso aproximado 3.950 kg. Rendimento 1,80 a 2,70 ha/h.",
+    img: JAN_IMG + "1599747915916.webp" },
+  // --- JUMBO MATIC BUSTER ---
+  { id:"jan-jumbo-buster-6", brand:"Jan", cat:"Subsolador", name:"Jumbo Matic Buster 6/6",
+    finame:"", ncm:"8432.10.00",
+    desc:"Subsolador Jumbo Matic Buster com 6 braços e disco de corte de 22pol. Largura de trabalho 3.600 mm. Profundidade 200 a 500 mm. Rolo destorroador com mancais em banho de óleo. Acoplamento três pontos Cat. II e III. 30 cv/braço. Rendimento 1,44 a 2,16 ha/h.",
+    img: JAN_IMG + "1744312839-_dsc9650-png.png" },
+  { id:"jan-jumbo-buster-9-7", brand:"Jan", cat:"Subsolador", name:"Jumbo Matic Buster 9/7",
+    finame:"", ncm:"8432.10.00",
+    desc:"Subsolador Jumbo Matic Buster 9/7 com 7 braços (espaçamento 600 mm) ou 9 braços (espaçamento 400 mm opcional). Disco de corte 22pol. Largura 4.200 mm. Profundidade 200 a 500 mm. Barra de tração. 30 cv/braço. Rendimento 1,70 a 2,50 ha/h.",
+    img: JAN_IMG + "1744312839-_dsc9650-png.png" },
+  // --- FERTILLUS HD ---
+  { id:"jan-fertillus-hd-700-6", brand:"Jan", cat:"Subsolador com Fertilização", name:"Fertillus HD 700/6",
+    finame:"", ncm:"8432.10.00",
+    desc:"Subsolador com fertilização Fertillus HD 700/6  -  6 braços com espaçamento 500 mm. Profundidade até 40 cm. Capacidade 2.450 L. Dosagem 300 a 3.000 kg/ha. Sistema de sopro hidráulico (3.500-4.000 rpm). Chassi rígido Heavy Duty. Desarme hidráulico automático dos braços. 35-45 cv/braço. Pneu 600/50-R22.5.",
+    img: JAN_IMG + "1604683716696.webp" },
+  { id:"jan-fertillus-hd-1100-9", brand:"Jan", cat:"Subsolador com Fertilização", name:"Fertillus HD 1100/9",
+    finame:"", ncm:"8432.10.00",
+    desc:"Subsolador com fertilização Fertillus HD 1100/9  -  9 braços (500 mm) ou 11 braços (400 mm). Profundidade 15 a 40 cm. Capacidade 3.700 L. Largura de trabalho 4.500 mm (9 braços). Dosagem 300 a 3.000 kg/ha. Rendimento 1,80 a 2,70 ha/h. Pneu 600/50-R22.5.",
+    img: JAN_IMG + "1604683716696.webp" },
+  { id:"jan-fertillus-hd-1500-12", brand:"Jan", cat:"Subsolador com Fertilização", name:"Fertillus HD 1500/12",
+    finame:"", ncm:"8432.10.00",
+    desc:"Maior modelo Fertillus HD 1500/12  -  12 braços (500 mm) ou 15 braços (400 mm). Largura de trabalho 6.000 mm. Capacidade 5.100 L. Profundidade 15 a 40 cm. Dosagem 300 a 3.000 kg/ha. Rendimento até 3,60 ha/h (12 braços). Peso aproximado 10.890 kg.",
+    img: JAN_IMG + "1604683716696.webp" },
+
+  // --- SEMEADORAS SPJ ---
+  { id:"jan-spj-2517", brand:"Jan", cat:"Semeadora de Grãos Finos", name:"SPJ 2517 (25 linhas)",
+    finame:"", ncm:"8432.31.00",
+    desc:"Semeadora de grãos finos SPJ 2517  -  25 linhas, espaçamento 17 cm. Largura de trabalho 2.450 mm. Potência 4-6 cv/linha. Reservatório semente 1.511 L (inox), adubo 1.485 L, pastagem 212 L. Deposição de semente à frente do adubo. Linha pantográfica 500 mm. Buchas autolubrificantes. Sulcadores defasados 15,5pol/16pol. Peso aproximado 5.995 kg. Rendimento 2,55 a 5,10 ha/h.",
+    img: JAN_IMG + "1599759603289.webp" },
+  { id:"jan-spj-2917", brand:"Jan", cat:"Semeadora de Grãos Finos", name:"SPJ 2917 (29 linhas)",
+    finame:"", ncm:"8432.31.00",
+    desc:"Semeadora de grãos finos SPJ 2917  -  29 linhas, espaçamento 17 cm. Largura de trabalho 4.930 mm. Potência 4-6 cv/linha. Reservatório semente 1.738 L (inox), adubo 1.707 L. Deposição de semente à frente do adubo. Linha pantográfica 500 mm. Rolamentos blindados em cubos. Peso aproximado 7.614 kg. Rendimento 2,96 a 5,92 ha/h.",
+    img: JAN_IMG + "1599759603289.webp" },
+  { id:"jan-spj-3517", brand:"Jan", cat:"Semeadora de Grãos Finos", name:"SPJ 3517 (35 linhas)",
+    finame:"", ncm:"8432.31.00",
+    desc:"Semeadora de grãos finos SPJ 3517  -  35 linhas, espaçamento 17 cm. Largura de trabalho 5.950 mm. Potência 4-6 cv/linha. Reservatório semente 2.052 L (inox), adubo 2.016 L. Linha pantográfica de 500 mm de articulação. Levante hidráulico com cilindros e válvulas de segurança. Peso aproximado 8.625 kg. Rendimento 3,57 a 7,14 ha/h.",
+    img: JAN_IMG + "1599759603289.webp" },
+  { id:"jan-spj-4117", brand:"Jan", cat:"Semeadora de Grãos Finos", name:"SPJ 4117 (41 linhas)",
+    finame:"", ncm:"8432.31.00",
+    desc:"Maior semeadora SPJ 4117  -  41 linhas, espaçamento 17 cm. Largura de trabalho 6.970 mm. Reservatório semente 2.367 L (inox), adubo 2.325 L, pastagem 332 L. Deposição de semente à frente do adubo. Transmissão por engrenagens, taxa variável opcional. Peso aproximado 10.175 kg. Rendimento 4,18 a 8,36 ha/h.",
+    img: JAN_IMG + "1744315676-1722291587481-webp.webp" },
+
+  // --- PULVERIZADOR SPARTAN ---
+  { id:"jan-spartan-3000", brand:"Jan", cat:"Pulverizador Autopropelido", name:"Spartan 3.000 4x4 Hidro",
+    finame:"", ncm:"8432.41.00",
+    desc:"Pulverizador autopropelido Spartan 3.000 4x4 Hidro. Motor MWM 190 cv Turbo Aftercooler. Transmissão hidrostática Bosch Rexroth. Tanque 3.000 L + 250 L água limpa. Barras 30 m. Bomba UDOR 170 L/min. Computador Smart Jan 10pol. Comando eletrônico 7 ou 11 secoes. Suspensao pneumatica independente. Peso vazio 9.100 kg / carregada 12.640 kg. Bitola regulavel 2,50 a 3,20 m.",
+    img: JAN_IMG + "1599659089291.webp" },
+
+  // --- DISTRIBUIDOR SPARTLANCER ---
+  { id:"jan-spartlancer-6200", brand:"Jan", cat:"Distribuidor Autopropelido", name:"Spartlancer 6.200 4x4",
+    finame:"", ncm:"8432.42.00",
+    desc:"Distribuidor autopropelido Spartlancer 6.200 4x4. Motor MWM 260 cv. 100% inox incluindo deposito, discos, comportas e chassi. Capacidade 6 m3 / 6.000 kg. Largura distribuicao ate 42 m. Transmissao hidrostatica 4x4 Bosch Rexroth. ABS, HBL, Cruise Control, Eco Mode. Taxa variavel SMART JAN. Bitola regulavel 2.850 a 3.550 mm. Peso vazio 10.070 kg. Rampa maxima 31,5%.",
+    img: JAN_IMG + "1742999182-1680187979985-webp.webp" },
+
+  // --- CARRETAS GRANELEIRAS TANKER ---
+  { id:"jan-tanker-10000", brand:"Jan", cat:"Carreta Graneleira", name:"Tanker 10.000",
+    finame:"", ncm:"8716.39.00",
+    desc:"Carreta graneleira Tanker 10.000. Capacidade 10.000 L / 125 sacas. Tubo de descarga 320 mm. Altura de descarga 4.025 mm. Descarga 46 sacas/min em 2min40s. Acionamento 540 rpm via TDP. Acoplamento barra de tracao. Transmissao em banho de oleo. Caixa de captacao protege integridade dos graos. Rodado DW 16-30.",
+    img: JAN_IMG + "1744206773-tanker-10-000-png.png" },
+  { id:"jan-tanker-10500", brand:"Jan", cat:"Carreta Graneleira", name:"Tanker 10.500",
+    finame:"", ncm:"8716.39.00",
+    desc:"Carreta graneleira Tanker 10.500. Capacidade 10.500 L / 130 sacas. Tubo de descarga 320 mm. Altura de descarga 4.360 mm. Descarga 46 sacas/min em 2min50s. Depósito carbono desmontável. Rodado DW 16-30. Peso vazio 2.270 kg. Comprimento 6.255 mm. Sistema Enlona Fácil disponível.",
+    img: JAN_IMG + "1744206773-tanker-10-000-png.png" },
+  { id:"jan-tanker-10500-inox", brand:"Jan", cat:"Carreta Graneleira", name:"Tanker 10.500 Inox",
+    finame:"", ncm:"8716.39.00",
+    desc:"Carreta graneleira Tanker 10.500 Inox. Capacidade 10.500 L / 130 sacas. Depósito em aço inox desmontável. Tubo multiuso  -  descarga de grãos e adubo granulado. Descarga 46 sacas/min. Dois bocais: lona (sementes) e mangote (plantadeiras). Rodado DW 16-30. Peso vazio 2.270 kg.",
+    img: JAN_IMG + "1744206773-tanker-10-000-png.png" },
+  { id:"jan-tanker-15000", brand:"Jan", cat:"Carreta Graneleira", name:"Tanker 15.000",
+    finame:"", ncm:"8716.39.00",
+    desc:"Carreta graneleira Tanker 15.000. Capacidade 15.000 L / 187 sacas. Tubo de descarga 320 mm. Altura de descarga 4.525 mm. Descarga 46 sacas/min em 3min15s. Rodado DW 20-26. Peso vazio 2.430 kg. Comprimento 6.255 mm. Caixa de captação protege integridade dos grãos.",
+    img: JAN_IMG + "1744206773-tanker-10-000-png.png" },
+  { id:"jan-tanker-15000-inox", brand:"Jan", cat:"Carreta Graneleira", name:"Tanker 15.000 Inox",
+    finame:"", ncm:"8716.39.00",
+    desc:"Carreta graneleira Tanker 15.000 Inox. Capacidade 15.000 L / 187 sacas. Depósito em aço inox desmontável. Tubo multiuso para grãos e adubo granulado. Rodado DW 20-26. Peso vazio 2.430 kg. Sistema Enlona Fácil. Abertura de comporta com calço limitador.",
+    img: JAN_IMG + "1744206773-tanker-10-000-png.png" },
+
+  // --- TANKER FAST ---
+  { id:"jan-tanker-fast-19000", brand:"Jan", cat:"Carreta Graneleira", name:"Tanker Fast 19.000",
+    finame:"", ncm:"8716.39.00",
+    desc:"Carreta graneleira Tanker Fast 19.000. Capacidade 19.000 L / 240 sacas. Tubo descarga 500 mm. Altura descarga 4.000 mm. Descarga 200 sacas/min em 2min. Potência mínima 150 cv. Rodado DW 27A-32. Peso vazio 3.750 kg. Comprimento 6.574 mm. Direcionador de fluxo para melhor condução no caminhão.",
+    img: JAN_IMG + "1742999767-tanker-fast-19000-webp.webp" },
+  { id:"jan-tanker-fast-33000", brand:"Jan", cat:"Carreta Graneleira", name:"Tanker Fast 33.000",
+    finame:"", ncm:"8716.39.00",
+    desc:"Carreta graneleira Tanker Fast 33.000. Capacidade 32.000 L / 400 sacas. Tubo descarga 500 mm. Altura descarga 4.265 mm. Descarga 200 sacas/min em 2min. Potência mínima 200 cv. Rodado DW 27A-32. Peso vazio 5.500 kg. Comprimento 8.360 mm. Sistema Enlona Fácil.",
+    img: JAN_IMG + "1742999767-tanker-fast-19000-webp.webp" },
+  { id:"jan-tanker-fast-50000", brand:"Jan", cat:"Carreta Graneleira", name:"Tanker Fast 50.000",
+    finame:"", ncm:"8716.39.00",
+    desc:"Maior carreta da linha Fast. Capacidade 50.000 L / 625 sacas. 6 rodas. Tubo descarga 500 mm. Altura descarga 4.500 mm. Descarga 200 sacas/min em 3min10s. Potência mínima 240 cv. Acionamento via VCR do trator. Eixo com freios. Peso vazio 14.400 kg. Comprimento 12.100 mm.",
+    img: JAN_IMG + "1742999767-tanker-fast-19000-webp.webp" },
+
+  // --- TANKER MAGNU ---
+  { id:"jan-tanker-magnu-20000", brand:"Jan", cat:"Carreta Graneleira", name:"Tanker Magnu 20.000",
+    finame:"", ncm:"8716.39.00",
+    desc:"Carreta graneleira Tanker Magnu 20.000. Capacidade 20.000 L / 250 sacas. Tubo descarga 370 mm. Altura descarga 4.500 mm. Descarga 75 sacas/min. Potência mínima 150 cv. Rodado DW 16A-30/DW 20A-26. Peso vazio 4.540 kg. Comprimento 8.100 mm. Embreagem eletromagnética opcional.",
+    img: JAN_IMG + "1744209414-tanker-magnu-35-000-png.png" },
+  { id:"jan-tanker-magnu-20000-inox", brand:"Jan", cat:"Carreta Graneleira", name:"Tanker Magnu 20.000 Inox",
+    finame:"", ncm:"8716.39.00",
+    desc:"Carreta graneleira Tanker Magnu 20.000 Inox. Capacidade 20.000 L / 250 sacas. Depósito em aço inox. Tubo multiuso 335 mm  -  descarga de grãos e adubo granulado para plantadeiras. Potência 150 cv. Peso vazio 4.540 kg.",
+    img: JAN_IMG + "1744209414-tanker-magnu-35-000-png.png" },
+  { id:"jan-tanker-magnu-25000", brand:"Jan", cat:"Carreta Graneleira", name:"Tanker Magnu 25.000",
+    finame:"", ncm:"8716.39.00",
+    desc:"Carreta graneleira Tanker Magnu 25.000. Capacidade 25.000 L / 310 sacas. Tubo descarga 370 mm. Descarga 75 sacas/min. Potência mínima 180 cv. Rodado DW 20A-26/DW 25A-26. Peso vazio 4.660 kg. Comprimento 8.100 mm.",
+    img: JAN_IMG + "1744209414-tanker-magnu-35-000-png.png" },
+  { id:"jan-tanker-magnu-25000-inox", brand:"Jan", cat:"Carreta Graneleira", name:"Tanker Magnu 25.000 Inox",
+    finame:"", ncm:"8716.39.00",
+    desc:"Carreta graneleira Tanker Magnu 25.000 Inox. Capacidade 25.000 L / 310 sacas. Depósito inox. Tubo multiuso 335 mm para grãos e adubo. Potência 180 cv. Peso vazio 4.660 kg. Abastecimento de fertilizantes na plantadeira incluso.",
+    img: JAN_IMG + "1744209414-tanker-magnu-35-000-png.png" },
+  { id:"jan-tanker-magnu-35000", brand:"Jan", cat:"Carreta Graneleira", name:"Tanker Magnu 35.000",
+    finame:"", ncm:"8716.39.00",
+    desc:"Carreta graneleira Tanker Magnu 35.000. Capacidade 35.000 L / 430 sacas. Tubo descarga 500 mm, 180 sacas/min. Altura descarga 4.440 mm. Potência 210 a 230 cv. Acionamento TDP 540/1.000 rpm. Rodado 4 rodas DW 27A-32. Peso vazio 8.210 kg. Comprimento 10.480 mm.",
+    img: JAN_IMG + "1744209414-tanker-magnu-35-000-png.png" },
+  { id:"jan-tanker-magnu-40000", brand:"Jan", cat:"Carreta Graneleira", name:"Tanker Magnu 40.000",
+    finame:"", ncm:"8716.39.00",
+    desc:"Carreta graneleira Tanker Magnu 40.000. Capacidade 40.000 L / 500 sacas. Tubo descarga 500 mm, 180 sacas/min em 2min50s. Potência 230 a 250 cv. TDP 540/1.000 rpm. Rodado AG 27. Peso vazio 8.320 kg. Comprimento 10.480 mm.",
+    img: JAN_IMG + "1744209414-tanker-magnu-35-000-png.png" },
+  { id:"jan-tanker-magnu-45000", brand:"Jan", cat:"Carreta Graneleira", name:"Tanker Magnu 45.000",
+    finame:"", ncm:"8716.39.00",
+    desc:"Maior graneleiro Tanker Magnu 45.000. Capacidade 45.000 L / 520 sacas. Tubo descarga 500 mm, 180 sacas/min. 6 rodas DW 25-26. Potência 250 a 280 cv. TDP 540/1.000 rpm. Peso vazio 9.140 kg. Comprimento 10.480 mm. Sistema Enlona Fácil.",
+    img: JAN_IMG + "1744209414-tanker-magnu-35-000-png.png" },
+
+  // --- TRITTON TRITURADOR ---
+  { id:"jan-tritton-1800", brand:"Jan", cat:"Triturador de Restos de Cultura", name:"Tritton 1.800",
+    finame:"", ncm:"8433.20.90",
+    desc:"Triturador Tritton 1.800. Largura de corte 1.800 mm. Três pontos Cat. II. 60 cv. 48 facas curvas 6,35 mm oscilantes e reversíveis. Rotor balanceamento dinâmico. Altura de corte 7 a 22 cm. Peso 650 kg. Rendimento 0,7 a 1,0 ha/h. Palhetas difusoras para distribuição uniforme dos restos.",
+    img: JAN_IMG + "159982381530.webp" },
+  { id:"jan-tritton-2300", brand:"Jan", cat:"Triturador de Restos de Cultura", name:"Tritton 2.300",
+    finame:"", ncm:"8433.20.90",
+    desc:"Triturador Tritton 2.300. Largura de corte 2.300 mm. Três pontos Cat. II. 75 cv. 64 facas curvas 6,35 mm oscilantes e reversíveis. Altura de corte 7 a 22 cm. Peso 735 kg. Rendimento 0,9 a 1,4 ha/h. Torre de acoplamento articulada acompanha ondulações do terreno.",
+    img: JAN_IMG + "159982381530.webp" },
+  { id:"jan-tritton-3000", brand:"Jan", cat:"Triturador de Restos de Cultura", name:"Tritton 3.000",
+    finame:"", ncm:"8433.20.90",
+    desc:"Triturador Tritton 3.000. Largura de corte 3.000 mm. Acoplamento por barra de tração. 100 cv. 128 facas curvas 9,5 mm oscilantes e reversíveis. Altura de corte 7 a 27 cm. Pneus 6,5x10. Peso 1.260 kg. Rendimento 1,2 a 1,8 ha/h. Cabeçalho articulado com cilindro hidráulico.",
+    img: JAN_IMG + "159982381530.webp" },
+  { id:"jan-tritton-3600", brand:"Jan", cat:"Triturador de Restos de Cultura", name:"Tritton 3.600",
+    finame:"", ncm:"8433.20.90",
+    desc:"Triturador Tritton 3.600. Largura de corte 3.600 mm. Acoplamento barra de tração. 100 cv. 128 facas curvas 9,5 mm. Altura de corte 7 a 27 cm. Pneus 6,5x10 arobipartido. Peso 1.630 kg. Rendimento 1,4 a 2,2 ha/h. Cabeçalho com articulação hidráulica e calços de nivelamento.",
+    img: JAN_IMG + "159982381530.webp" },
+  { id:"jan-tritton-4600", brand:"Jan", cat:"Triturador de Restos de Cultura", name:"Tritton 4.600",
+    finame:"", ncm:"8433.20.90",
+    desc:"Maior triturador Tritton 4.600. Largura de corte 4.600 mm. Acoplamento barra de tração. 120 cv. 160 facas curvas 9,5 mm oscilantes e reversíveis. Altura de corte 7 a 27 cm. Peso 1.975 kg. Rendimento 1,8 a 2,8 ha/h. Distribuição uniforme em leque sobre o solo.",
+    img: JAN_IMG + "159982381530.webp" },
+];
+
+// Catálogo unificado
+const ALL_CATALOG = [
+  ...GTS_CATALOG.map(p => ({...p, brand: p.brand || 'GTS do Brasil'})),
+  ...JAN_CATALOG,
+];
+
+const STATUS_OPTIONS = [
+  { value: "aguardando", label: "Aguardando Cliente", color: "status-aguardando" },
+  { value: "aceito", label: "Aceito / Faturado", color: "status-aceito" },
+  { value: "perdido", label: "Perdido", color: "status-perdido" },
+  { value: "desistencia", label: "Desistência do Cliente", color: "status-desistencia" },
+];
+
+const PAYMENT_TYPES = ["Boleto", "PIX", "Cartão", "Financiamento", "Parcelado"];
+
+const INITIAL_SELLERS = [
+  { id: "1", name: "Denize Frigeri", initials: "DF" },
+  { id: "2", name: "Joselito Frigeri", initials: "JF" },
+  { id: "3", name: "Paulo Cesar", initials: "PC" },
+  { id: "4", name: "Célio Martins", initials: "CM" },
+];
+
+// ============ STORAGE ============
+const storage = {
+  get: (key) => { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } },
+  set: (key, val) => { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} },
+};
+
+// ============ GITHUB SYNC ============
+const ghSync = {
+  getConfig: () => ({
+    token: localStorage.getItem('gh_token') || '',
+    owner: localStorage.getItem('gh_owner') || '',
+    repo:  localStorage.getItem('gh_repo')  || '',
+  }),
+  setConfig: (token, owner, repo) => {
+    localStorage.setItem('gh_token', token);
+    localStorage.setItem('gh_owner', owner);
+    localStorage.setItem('gh_repo',  repo);
+  },
+  clearConfig: () => {
+    ['gh_token','gh_owner','gh_repo'].forEach(k => localStorage.removeItem(k));
+  },
+  isConfigured: () => {
+    const { token, owner, repo } = ghSync.getConfig();
+    return !!(token && owner && repo);
+  },
+  _headers: () => {
+    const { token } = ghSync.getConfig();
+    return { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' };
+  },
+  _url: () => {
+    const { owner, repo } = ghSync.getConfig();
+    return `https://api.github.com/repos/${owner}/${repo}/contents/data/proposals.json`;
+  },
+  load: async () => {
+    if (!ghSync.isConfigured()) return null;
+    try {
+      const resp = await fetch(ghSync._url(), { headers: ghSync._headers() });
+      if (resp.status === 404) return { proposals: [], sellers: null, sha: null };
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const data = await resp.json();
+      const content = JSON.parse(atob(data.content.replace(/\n/g, '')));
+      return { ...content, sha: data.sha };
+    } catch(e) {
+      console.warn('GitHub load failed:', e);
+      return null;
+    }
+  },
+  save: async (payload, sha) => {
+    if (!ghSync.isConfigured()) return null;
+    try {
+      const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
+      const body = { message: `sync: ${new Date().toISOString()}`, content: encoded };
+      if (sha) body.sha = sha;
+      const resp = await fetch(ghSync._url(), { method: 'PUT', headers: ghSync._headers(), body: JSON.stringify(body) });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const result = await resp.json();
+      return result.content.sha;
+    } catch(e) {
+      console.warn('GitHub save failed:', e);
+      return null;
+    }
+  },
+};
+
+// ============ HELPERS ============
+const initials = (name) => name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+const fmtDate = (d) => d ? new Date(d).toLocaleDateString('pt-BR') : '';
+const fmtCurrency = (v) => {
+  const clean = String(v||'').replace(/[R$\s.]/g,'').replace(',','.');
+  const n = parseFloat(clean) || 0;
+  return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+};
+
+// ============ MASCARAS ============
+const maskCPF = (v) => {
+  const d = (v||'').replace(/\D/g,'').slice(0,11);
+  return d.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+};
+const maskCNPJ = (v) => {
+  const d = (v||'').replace(/\D/g,'').slice(0,14);
+  return d
+    .replace(/(\d{2})(\d)/,'$1.$2')
+    .replace(/(\d{3})(\d)/,'$1.$2')
+    .replace(/(\d{3})(\d)/,'$1/$2')
+    .replace(/(\d{4})(\d{1,2})$/,'$1-$2');
+};
+const maskDoc = (v, tipo) => tipo === 'cnpj' ? maskCNPJ(v) : maskCPF(v);
+const maskPhone = (v) => {
+  const d = (v||'').replace(/\D/g,'').slice(0,11);
+  if (d.length <= 10) return d.replace(/(\d{2})(\d)/,'($1) $2').replace(/(\d{4})(\d)/,'$1-$2');
+  return d.replace(/(\d{2})(\d)/,'($1) $2').replace(/(\d{5})(\d)/,'$1-$2');
+};
+const parseCurrency = (v) => {
+  const clean = String(v||'').replace(/[R$\s.]/g,'').replace(',','.');
+  return parseFloat(clean) || 0;
+};
+const maskCurrency = (v) => {
+  const digits = String(v||'').replace(/\D/g,'');
+  if (!digits) return '';
+  const n = parseInt(digits, 10) / 100;
+  return n.toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
+};
+const nextProposalNum = (proposals) => {
+  const nums = proposals.map(p => parseInt(p.num?.replace(/\D/g,'')||0));
+  const max = nums.length ? Math.max(...nums) : 0;
+  return `COI-${String(max+1).padStart(4,'0')}`;
+};
+
+// ============ IMAGE FETCH HELPER ============
+const fetchImageAsBase64 = async (url) => {
+  if (!url) return null;
+  // Already a base64 data URL (user gallery photos)
+  if (url.startsWith('data:')) return url;
+
+  // Build proxy URL: images.weserv.nl adds CORS headers to any image
+  const stripProtocol = url.replace(/^https?:\/\//, '');
+  const proxyUrl = `https://images.weserv.nl/?url=${encodeURIComponent(stripProtocol)}&output=jpg&q=85`;
+
+  try {
+    const resp = await fetch(proxyUrl);
+    if (!resp.ok) throw new Error('proxy failed');
+    const blob = await resp.blob();
+    return await new Promise((res, rej) => {
+      const reader = new FileReader();
+      reader.onload = () => res(reader.result);
+      reader.onerror = rej;
+      reader.readAsDataURL(blob);
+    });
+  } catch(e) {
+    console.warn('Image fetch failed:', url, e);
+    return null;
+  }
+};
+
+// ============ PDF GENERATOR ============
+const generatePDF = async (proposal, seller, logoB64) => {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const W = 210, marginL = 14, marginR = 196;
+  const PAGE_H = 297, FOOTER_H = 18, SAFE_BOTTOM = PAGE_H - FOOTER_H - 8;
+
+  // Normalize: suporte a proposta antiga (sem items) e nova (com items)
+  const items = proposal.items && proposal.items.length > 0
+    ? proposal.items
+    : [{
+        product: proposal.product, brand: proposal.brand, model: proposal.model,
+        finame: proposal.finame, ncm: proposal.ncm, description: proposal.description,
+        productImg: proposal.productImg, photos: proposal.photos || [],
+        totalValue: proposal.totalValue, paymentType: proposal.paymentType,
+        installments: proposal.installments || [], deliveryTime: proposal.deliveryTime,
+      }];
+
+  // Pre-carregar todas as imagens
+  const itemImages = [];
+  for (const item of items) {
+    const prod = await fetchImageAsBase64(item.productImg || '');
+    const photos = [];
+    for (const ph of (item.photos || [])) {
+      const d = await fetchImageAsBase64(ph);
+      if (d) photos.push(d);
+    }
+    itemImages.push({ prod, photos });
+  }
+
+  // ---- HELPERS ----
+  const drawFooter = () => {
+    const total = doc.internal.getNumberOfPages();
+    for (let p = 1; p <= total; p++) {
+      doc.setPage(p);
+      doc.setFillColor(26,26,26);
+      doc.rect(0, PAGE_H - FOOTER_H, W, FOOTER_H, 'F');
+      doc.setTextColor(180,180,180);
+      doc.setFontSize(7);
+      doc.setFont('helvetica','normal');
+      doc.text('Centro Oeste Implementos | Esta proposta tem caráter comercial e está sujeita a alterações sem aviso prévio.', W/2, PAGE_H - FOOTER_H + 6, { align:'center' });
+      doc.setTextColor(232,160,32);
+      doc.text(`Proposta: ${proposal.num} | Vendedor: ${seller?.name||''} | Pág. ${p}/${total}`, W/2, PAGE_H - FOOTER_H + 11, { align:'center' });
+    }
+  };
+
+  const newPage = () => {
+    doc.addPage();
+    doc.setFillColor(45,106,45);
+    doc.rect(0, 0, W, 8, 'F');
+    doc.setTextColor(255,255,255);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(7);
+    doc.text(`PROPOSTA ${proposal.num}  -  ${proposal.clientName||''}  (continuação)`, W/2, 5.5, { align:'center' });
+    return 14;
+  };
+
+  const checkBreak = (y, needed) => {
+    if (y + needed > SAFE_BOTTOM) return newPage();
+    return y;
+  };
+
+  const sectionHeader = (y, label, color=[240,240,235], textColor=[45,106,45]) => {
+    y = checkBreak(y, 14);
+    doc.setFillColor(...color);
+    doc.rect(marginL, y, 182, 6, 'F');
+    doc.setTextColor(...textColor);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(9);
+    doc.text(label, marginL+2, y+4.5);
+    return y + 8;
+  };
+
+  // ---- CABEÇALHO (primeira página) ----
+  let y = 14;
+  doc.setFillColor(26,26,26);
+  doc.rect(0, 0, W, 42, 'F');
+  if (logoB64) {
+    try { doc.addImage('data:image/png;base64,' + logoB64, 'PNG', marginL, 6, 50, 28); } catch(e) {}
+  }
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(9);
+  doc.text('CENTRO OESTE IMPLEMENTOS', marginR, 14, { align:'right' });
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(8);
+  doc.text('Mato Grosso - Brasil', marginR, 19, { align:'right' });
+  doc.text(`Vendedor: ${seller?.name || ''}`, marginR, 24, { align:'right' });
+  doc.setFillColor(45,106,45);
+  doc.rect(0, 42, W, 12, 'F');
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(12);
+  doc.text('PROPOSTA COMERCIAL', W/2, 50, { align:'center' });
+  doc.setFillColor(232,160,32);
+  doc.rect(marginL, 57, 85, 7, 'F');
+  doc.rect(105, 57, 85, 7, 'F');
+  doc.setTextColor(26,26,26);
+  doc.setFontSize(8);
+  doc.setFont('helvetica','bold');
+  doc.text(`Nº ${proposal.num}`, marginL+2, 62);
+  doc.text(`Data: ${fmtDate(proposal.date)}`, 107, 62);
+  y = 70;
+
+  // ---- DADOS DO CLIENTE ----
+  y = sectionHeader(y, 'DADOS DO CLIENTE');
+  doc.setTextColor(26,26,26);
+  doc.setFontSize(9);
+  const clientRows = [
+    [`Cliente: ${proposal.clientName||''}`, `${(proposal.docTipo==='cnpj'?'CNPJ':'CPF')}: ${proposal.cpf||''}`],
+    [`Telefone: ${proposal.phone||''}`, `Fazenda: ${proposal.farm||''}`],
+    [`Cidade: ${proposal.city||''}${proposal.estado?' - '+proposal.estado:''}`, `Validade: ${fmtDate(proposal.validUntil)||'A definir'}`],
+  ];
+  clientRows.forEach(row => {
+    doc.setFont('helvetica','bold');
+    doc.text(row[0], marginL, y+4);
+    if (row[1]) doc.text(row[1], 105, y+4);
+    y += 6;
+  });
+  y += 4;
+
+  // ---- LOOP DE ITENS ----
+  for (let idx = 0; idx < items.length; idx++) {
+    const item = items[idx];
+    const imgs = itemImages[idx];
+
+    if (items.length > 1) {
+      y = checkBreak(y, 10);
+      doc.setFillColor(45,106,45);
+      doc.rect(marginL, y, 182, 7, 'F');
+      doc.setTextColor(255,255,255);
+      doc.setFont('helvetica','bold');
+      doc.setFontSize(9);
+      doc.text(`ITEM ${idx+1}${item.model ? '  -  ' + item.model : ''}`, marginL+3, y+5);
+      y += 10;
+    }
+
+    y = sectionHeader(y, 'DADOS DO PRODUTO');
+    doc.setTextColor(26,26,26);
+    const prodRows = [
+      [`Marca: ${item.brand||'GTS do Brasil'}`, `Modelo: ${item.model||''}`],
+      [`Cód. FINAME: ${item.finame||''}`, `NCM: ${item.ncm||''}`],
+      [`Produto: ${item.product||''}`, `Prazo de Entrega: ${item.deliveryTime||'A definir'}`],
+    ];
+    prodRows.forEach(row => {
+      y = checkBreak(y, 8);
+      doc.setFont('helvetica','bold');
+      doc.setFontSize(9);
+      doc.text(row[0], marginL, y+4);
+      if (row[1]) doc.text(row[1], 105, y+4);
+      y += 6;
+    });
+    y += 2;
+
+    if (item.description) {
+      doc.setFont('helvetica','normal');
+      doc.setFontSize(8.5);
+      if (imgs.prod) {
+        const imgW = 62, imgH = 46;
+        const textW = 182 - imgW - 4;
+        const descLines = doc.splitTextToSize(item.description, textW);
+        const blockH = Math.max(imgH, descLines.length * 5);
+        // checkBreak ANTES do header para manter titulo e texto na mesma pagina
+        y = checkBreak(y, blockH + 18);
+        y = sectionHeader(y, 'DESCRICAO DO PRODUTO');
+        doc.setTextColor(26,26,26);
+        doc.setFont('helvetica','normal');
+        doc.setFontSize(8.5);
+        try { doc.addImage(imgs.prod, 'JPEG', marginL + textW + 4, y, imgW, imgH); } catch(e){}
+        doc.text(descLines, marginL, y+4);
+        y += blockH + 4;
+      } else {
+        const descLines = doc.splitTextToSize(item.description, 178);
+        // checkBreak ANTES do header: 14 (header) + altura do texto
+        y = checkBreak(y, descLines.length * 5 + 20);
+        y = sectionHeader(y, 'DESCRICAO DO PRODUTO');
+        doc.setTextColor(26,26,26);
+        doc.setFont('helvetica','normal');
+        doc.setFontSize(8.5);
+        doc.text(descLines, marginL, y+4);
+        y += descLines.length * 5 + 4;
+      }
+    }
+
+    if (imgs.photos.length > 0) {
+      const cols = Math.min(imgs.photos.length, 3);
+      const spacing = 3;
+      const photoW = (182 - spacing*(cols-1)) / cols;
+      const photoH = photoW * 0.62;
+      // checkBreak ANTES do header
+      y = checkBreak(y, photoH + 18);
+      y = sectionHeader(y, 'FOTOS DO EQUIPAMENTO');
+      for (let c = 0; c < cols; c++) {
+        try { doc.addImage(imgs.photos[c], 'JPEG', marginL + c*(photoW+spacing), y, photoW, photoH); } catch(e){}
+      }
+      y += photoH + 3;
+      if (imgs.photos.length > 3) {
+        const cols2 = Math.min(imgs.photos.length - 3, 3);
+        y = checkBreak(y, photoH + 4);
+        for (let c = 0; c < cols2; c++) {
+          try { doc.addImage(imgs.photos[3+c], 'JPEG', marginL + c*(photoW+spacing), y, photoW, photoH); } catch(e){}
+        }
+        y += photoH + 3;
+      }
+    }
+
+    // Valor bruto do item
+    const itemBruto = parseCurrency(item.totalValue);
+    const itemTIs = item.tradeIns || [];
+    const itemTiTotal = itemTIs.reduce((s,t)=>s+parseCurrency(t.value),0);
+    const itemNet = Math.max(0, itemBruto - itemTiTotal);
+    const hasItemTI = itemTIs.length > 0 && itemTiTotal > 0;
+
+    y = checkBreak(y, 14);
+    doc.setFillColor(45, 82, 45);
+    doc.rect(marginL, y, 182, 10, 'F');
+    doc.setTextColor(232,160,32);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(11);
+    const itemLabel = items.length > 1 ? `VALOR DO ITEM ${idx+1}:` : 'VALOR DO EQUIPAMENTO NOVO:';
+    doc.text(itemLabel, marginL+4, y+7);
+    doc.text(fmtCurrency(item.totalValue), marginR, y+7, { align:'right' });
+    y += 14;
+
+    // Tabela de trade-ins se houver
+    if (hasItemTI) {
+      y = sectionHeader(y, 'EQUIPAMENTOS USADOS  -  ABATIMENTO NO VALOR', [253,235,235], [180,40,40]);
+      itemTIs.forEach((ti, tii) => {
+        y = checkBreak(y, 8);
+        const even = tii % 2 === 0;
+        if (even) { doc.setFillColor(255,248,248); doc.rect(marginL, y, 182, 7, 'F'); }
+        doc.setFont('helvetica','normal'); doc.setFontSize(9);
+        doc.setTextColor(120,40,40);
+        const tiDesc = `${ti.type||'Usado'}${ti.description ? '  -  '+ti.description : ''}`;
+        const tiModo = (ti.tipoUso||'avista')==='parcelas' ? ' (parcelado)' : ' (à vista)';
+        doc.text(`(${tii+1}) ${tiDesc}${tiModo}`, marginL+2, y+5);
+        doc.setFont('helvetica','bold');
+        doc.setTextColor(180,40,40);
+        doc.text(`(${fmtCurrency(ti.value)})`, marginR, y+5, {align:'right'});
+        y += 7;
+
+        // Sub-linhas de distribuição do usado (se parcelado)
+        if ((ti.tipoUso||'avista')==='parcelas' && (ti.parcelas||[]).length > 0) {
+          ti.parcelas.forEach((parc, pIdx) => {
+            y = checkBreak(y, 6);
+            doc.setFillColor(255,244,244);
+            doc.rect(marginL+4, y, 178, 6, 'F');
+            doc.setFont('helvetica','normal'); doc.setFontSize(8);
+            doc.setTextColor(150,50,50);
+            const parcObs = parc.obs ? `  -  ${parc.obs}` : '';
+            doc.text(`   ${pIdx+1}ª parcela do usado${parcObs}`, marginL+6, y+4);
+            doc.setFont('helvetica','bold');
+            doc.text(`(${fmtCurrency(parc.valor)})`, marginR, y+4, {align:'right'});
+            y += 6;
+          });
+        }
+      });
+
+      // Linha total trade-in
+      y = checkBreak(y, 7);
+      doc.setFillColor(240,220,220);
+      doc.rect(marginL, y, 182, 7, 'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(9);
+      doc.setTextColor(140,30,30);
+      doc.text('Total de Abatimento (Usados):', marginL+2, y+5);
+      doc.text(`(${fmtCurrency(itemTiTotal)})`, marginR, y+5, {align:'right'});
+      y += 10;
+
+      // Valor líquido destacado
+      y = checkBreak(y, 12);
+      doc.setFillColor(30,80,30);
+      doc.rect(marginL, y, 182, 12, 'F');
+      doc.setTextColor(144,238,144);
+      doc.setFont('helvetica','bold'); doc.setFontSize(12);
+      const netLabel = items.length > 1 ? `VALOR LÍQUIDO ITEM ${idx+1}:` : 'VALOR LÍQUIDO A PAGAR:';
+      doc.text(netLabel, marginL+4, y+8.5);
+      doc.setTextColor(255,255,255);
+      doc.text(fmtCurrency(itemNet), marginR, y+8.5, {align:'right'});
+      y += 16;
+    }
+
+    y = checkBreak(y, 30);
+    y = sectionHeader(y, 'CONDICAO DE PAGAMENTO');
+    doc.setTextColor(26,26,26);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(9);
+    doc.text(`Forma de Pagamento: ${item.paymentType||''}`, marginL, y+4);
+    y += 7;
+
+    if (item.paymentType === 'Parcelado' && item.installments?.length) {
+      // Montar tabela de parcelas com desconto de usados parcelados incluído
+      const tiParcelados = itemTIs.filter(ti=>(ti.tipoUso||'avista')==='parcelas' && (ti.parcelas||[]).length > 0);
+      const rows = item.installments.map((inst, i) => {
+        const descUsado = tiParcelados.reduce((s,ti)=>{
+          const tiParc = (ti.parcelas||[])[i];
+          return s + (tiParc ? parseCurrency(tiParc.valor) : 0);
+        }, 0);
+        const bruto = parseCurrency(inst.value);
+        const liquido = Math.max(0, bruto - descUsado);
+        const descontoStr = descUsado > 0 ? `(-${fmtCurrency(descUsado)})` : '';
+        return [
+          `${i+1}ª`,
+          fmtCurrency(bruto),
+          descontoStr,
+          fmtCurrency(liquido),
+          fmtDate(inst.date),
+          inst.note||''
+        ];
+      });
+      const hasDescontos = tiParcelados.length > 0;
+      y = checkBreak(y, Math.min(rows.length * 8 + 16, 60));
+      doc.autoTable({
+        startY: y,
+        head: [hasDescontos
+          ? ['Parc.','Valor Bruto','Desc. Usado','Valor Líquido','Vencimento','Obs']
+          : ['Parcela','Valor','Vencimento','Obs']
+        ],
+        body: hasDescontos ? rows : rows.map(r=>[`Parcela ${r[0].replace('ª','')}`,r[1],r[4],r[5]]),
+        margin: { left: marginL, right: 14 },
+        headStyles: { fillColor:[45,106,45], textColor:255, fontStyle:'bold', fontSize:8 },
+        bodyStyles: { fontSize:8 },
+        alternateRowStyles: { fillColor:[248,248,244] },
+        columnStyles: hasDescontos ? {2:{textColor:[180,40,40],fontStyle:'bold'}, 3:{fontStyle:'bold'}} : {},
+      });
+      y = doc.lastAutoTable.finalY + 6;
+    } else {
+      y += 2;
+    }
+
+    // Bloco de usados à vista (se houver) para mostrar como crédito disponível
+    const tiAVista = itemTIs.filter(ti=>(ti.tipoUso||'avista')==='avista');
+    const tiParceladoSemInst = itemTIs.filter(ti=>(ti.tipoUso||'avista')==='parcelas' && item.paymentType!=='Parcelado' && (ti.parcelas||[]).length > 0);
+    if (tiParceladoSemInst.length > 0) {
+      y = checkBreak(y, 10);
+      doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(140,30,30);
+      doc.text('Distribuição do(s) usado(s) no pagamento:', marginL, y+4);
+      y += 7;
+      tiParceladoSemInst.forEach(ti => {
+        (ti.parcelas||[]).forEach((parc, pIdx) => {
+          y = checkBreak(y, 6);
+          doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(120,40,40);
+          const obs = parc.obs ? `  -  ${parc.obs}` : '';
+          doc.text(`  Entrada ${pIdx+1} do usado "${ti.description||ti.type||'Usado'}"${obs}:`, marginL+2, y+4);
+          doc.setFont('helvetica','bold'); doc.setTextColor(180,40,40);
+          doc.text(`(${fmtCurrency(parc.valor)})`, marginR, y+4, {align:'right'});
+          y += 6;
+        });
+      });
+    }
+    y += 4;
+  }
+
+  // ---- RESUMO TOTAL GERAL (quando há mais de 1 item) ----
+  if (items.length > 1) {
+    const grandBruto = items.reduce((s,item)=>s+parseCurrency(item.totalValue),0);
+    const grandTI = items.reduce((s,item)=>s+(item.tradeIns||[]).reduce((ss,t)=>ss+parseCurrency(t.value),0),0);
+    const grandLiquido = Math.max(0, grandBruto - grandTI);
+    const hasAnyTI = grandTI > 0;
+    const rowsNeeded = items.length * 7 + (hasAnyTI ? 28 : 14) + 20;
+    y = checkBreak(y, rowsNeeded);
+
+    y = sectionHeader(y, 'RESUMO DA PROPOSTA', [232,160,32], [26,26,26]);
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(26,26,26);
+
+    items.forEach((item, i) => {
+      const iTiTotal = (item.tradeIns||[]).reduce((s,t)=>s+parseCurrency(t.value),0);
+      const iNet = Math.max(0, parseCurrency(item.totalValue) - iTiTotal);
+      y = checkBreak(y, 8);
+      const even = i % 2 === 0;
+      if (even) { doc.setFillColor(248,248,244); doc.rect(marginL, y, 182, 7, 'F'); }
+      doc.setFont('helvetica','normal'); doc.setFontSize(9);
+      doc.setTextColor(80,80,80);
+      doc.text(`Item ${i+1}${item.model?'  -  '+item.model:''}`, marginL+2, y+5);
+      if (iTiTotal > 0) {
+        doc.setFont('helvetica','bold'); doc.setTextColor(100,100,100);
+        doc.text(fmtCurrency(item.totalValue), marginR-45, y+5, {align:'right'});
+        doc.setTextColor(180,40,40);
+        doc.text(`(${fmtCurrency(iTiTotal)})`, marginR-2, y+5, {align:'right'});
+      } else {
+        doc.setFont('helvetica','bold'); doc.setTextColor(26,26,26);
+        doc.text(fmtCurrency(item.totalValue), marginR, y+5, {align:'right'});
+      }
+      y += 7;
+    });
+
+    doc.setDrawColor(200,200,200); doc.line(marginL, y, marginR, y); y += 3;
+
+    if (hasAnyTI) {
+      // Subtotal bruto
+      y = checkBreak(y, 8);
+      doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(80,80,80);
+      doc.text('Subtotal Bruto:', marginL+2, y+5);
+      doc.setFont('helvetica','bold'); doc.setTextColor(26,26,26);
+      doc.text(fmtCurrency(grandBruto), marginR, y+5, {align:'right'}); y += 7;
+
+      // Total abatimento
+      y = checkBreak(y, 8);
+      doc.setFillColor(255,245,245); doc.rect(marginL, y, 182, 7, 'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(140,30,30);
+      doc.text('(-) Total Abatimento (Usados):', marginL+2, y+5);
+      doc.text(`(${fmtCurrency(grandTI)})`, marginR, y+5, {align:'right'}); y += 10;
+
+      doc.setDrawColor(180,180,180); doc.line(marginL, y, marginR, y); y += 3;
+    }
+
+    // Total final
+    y = checkBreak(y, 14);
+    doc.setFillColor(26,26,26); doc.rect(marginL, y, 182, 14, 'F');
+    doc.setTextColor(232,160,32); doc.setFont('helvetica','bold'); doc.setFontSize(13);
+    doc.text(hasAnyTI ? 'TOTAL LÍQUIDO GERAL DA PROPOSTA:' : 'TOTAL GERAL DA PROPOSTA:', marginL+4, y+9.5);
+    doc.setTextColor(255,255,255);
+    doc.text(fmtCurrency(grandLiquido), marginR, y+9.5, {align:'right'});
+    y += 18;
+  }
+  if (proposal.notes && proposal.notes.trim()) {
+    y = sectionHeader(y, 'OBSERVAÇÕES');
+    doc.setTextColor(26,26,26);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(8.5);
+    const noteLines = doc.splitTextToSize(proposal.notes.trim(), 178);
+    const noteH = noteLines.length * 5 + 4;
+    y = checkBreak(y, noteH);
+    doc.text(noteLines, marginL, y+4);
+    y += noteH + 4;
+  }
+
+  // ---- ASSINATURAS ----
+  y = checkBreak(y, 30);
+  y += 6;
+  doc.setDrawColor(180,180,180);
+  doc.line(marginL, y, 90, y);
+  doc.line(105, y, marginR, y);
+  doc.setTextColor(120,120,120);
+  doc.setFontSize(8);
+  doc.setFont('helvetica','normal');
+  doc.text('Assinatura do Vendedor', marginL, y+5);
+  doc.text('Assinatura do Cliente', 105, y+5);
+  doc.text(seller?.name || '', marginL, y+10);
+
+  // ---- RODAPÉ EM TODAS AS PÁGINAS ----
+  drawFooter();
+
+  doc.save(`Proposta_${proposal.num}_${(proposal.clientName||'cliente').replace(/\s/g,'_')}.pdf`);
+};
+
+// ============ MAIN APP ============
+function App() {
+  const [sellers, setSellers] = useState(() => storage.get('sellers') || INITIAL_SELLERS);
+  const [currentSeller, setCurrentSeller] = useState(() => storage.get('currentSeller') || null);
+  const [proposals, setProposals] = useState(() => storage.get('proposals') || []);
+  const [tab, setTab] = useState('dashboard');
+  const [editProposal, setEditProposal] = useState(null);
+  const [showNewSeller, setShowNewSeller] = useState(false);
+  const [newSellerName, setNewSellerName] = useState('');
+  const [viewProposal, setViewProposal] = useState(null);
+  const [filterStatus, setFilterStatus] = useState('');
+  const [filterSearch, setFilterSearch] = useState('');
+  const [showStatusModal, setShowStatusModal] = useState(null);
+  const [logoB64, setLogoB64] = useState(LOGO_B64);
+
+  // GitHub Sync state
+  const [syncStatus, setSyncStatus] = useState('idle'); // idle | syncing | ok | error
+  const [syncMsg, setSyncMsg] = useState('');
+  const [showGhConfig, setShowGhConfig] = useState(false);
+  const [ghToken, setGhToken] = useState(() => localStorage.getItem('gh_token') || '');
+  const [ghOwner, setGhOwner] = useState(() => localStorage.getItem('gh_owner') || '');
+  const [ghRepo, setGhRepo] = useState(() => localStorage.getItem('gh_repo') || '');
+  const fileSha = useRef(null);
+  const syncTimer = useRef(null);
+
+  // Load from GitHub on mount
+  useEffect(() => {
+    if (!ghSync.isConfigured()) return;
+    setSyncStatus('syncing'); setSyncMsg('Carregando do GitHub...');
+    ghSync.load().then(remote => {
+      if (!remote) { setSyncStatus('error'); setSyncMsg('Falha ao carregar'); return; }
+      fileSha.current = remote.sha;
+      if (remote.proposals && remote.proposals.length > 0) {
+        setProposals(remote.proposals);
+        storage.set('proposals', remote.proposals);
+      }
+      if (remote.sellers && remote.sellers.length > 0) {
+        setSellers(remote.sellers);
+        storage.set('sellers', remote.sellers);
+      }
+      setSyncStatus('ok'); setSyncMsg('Sincronizado');
+    });
+  }, []);
+
+  // Auto-sync proposals to GitHub with debounce
+  const triggerSync = useCallback((p, s) => {
+    if (!ghSync.isConfigured()) return;
+    clearTimeout(syncTimer.current);
+    setSyncStatus('syncing'); setSyncMsg('Salvando...');
+    syncTimer.current = setTimeout(async () => {
+      const newSha = await ghSync.save({ proposals: p, sellers: s }, fileSha.current);
+      if (newSha) { fileSha.current = newSha; setSyncStatus('ok'); setSyncMsg('Salvo no GitHub'); }
+      else { setSyncStatus('error'); setSyncMsg('Erro ao salvar'); }
+    }, 1500);
+  }, []);
+
+  useEffect(() => { storage.set('sellers', sellers); }, [sellers]);
+  useEffect(() => { storage.set('proposals', proposals); triggerSync(proposals, sellers); }, [proposals]);
+  useEffect(() => { storage.set('currentSeller', currentSeller); }, [currentSeller]);
+
+  const saveGhConfig = () => {
+    ghSync.setConfig(ghToken.trim(), ghOwner.trim(), ghRepo.trim());
+    setShowGhConfig(false);
+    setSyncStatus('syncing'); setSyncMsg('Conectando...');
+    ghSync.load().then(remote => {
+      if (!remote) { setSyncStatus('error'); setSyncMsg('Token/repo inválido'); return; }
+      fileSha.current = remote.sha;
+      if (remote.proposals && remote.proposals.length > 0) {
+        setProposals(remote.proposals);
+        storage.set('proposals', remote.proposals);
+      }
+      setSyncStatus('ok'); setSyncMsg('Conectado!');
+    });
+  };
+
+  const manualSync = async () => {
+    if (!ghSync.isConfigured()) { setShowGhConfig(true); return; }
+    setSyncStatus('syncing'); setSyncMsg('Sincronizando...');
+    const newSha = await ghSync.save({ proposals, sellers }, fileSha.current);
+    if (newSha) { fileSha.current = newSha; setSyncStatus('ok'); setSyncMsg('Sincronizado!'); }
+    else { setSyncStatus('error'); setSyncMsg('Erro ao sincronizar'); }
+  };
+
+  const saveProposal = (p) => {
+    setProposals(prev => {
+      const idx = prev.findIndex(x => x.id === p.id);
+      if (idx >= 0) { const n=[...prev]; n[idx]=p; return n; }
+      return [p, ...prev];
+    });
+    setEditProposal(null);
+    setTab('historico');
+  };
+
+  const deleteProposal = (id) => {
+    if (confirm('Excluir esta proposta?')) setProposals(prev => prev.filter(p => p.id !== id));
+  };
+
+  const updateStatus = (id, status) => {
+    setProposals(prev => prev.map(p => p.id===id ? {...p, status} : p));
+    setShowStatusModal(null);
+  };
+
+  const addSeller = () => {
+    if (!newSellerName.trim()) return;
+    const s = { id: Date.now().toString(), name: newSellerName.trim(), initials: initials(newSellerName.trim()) };
+    setSellers(prev => [...prev, s]);
+    setNewSellerName('');
+    setShowNewSeller(false);
+  };
+
+  if (!currentSeller) {
+    return <LoginScreen sellers={sellers} onSelect={setCurrentSeller} showNewSeller={showNewSeller}
+      setShowNewSeller={setShowNewSeller} newSellerName={newSellerName} setNewSellerName={setNewSellerName}
+      addSeller={addSeller} logoB64={logoB64} />;
+  }
+
+  const myProposals = proposals; // show all for admin view
+
+  const syncIcon = syncStatus === 'syncing' ? <span className="sync-spin">⟳</span>
+    : syncStatus === 'ok' ? '✓' : syncStatus === 'error' ? '✕' : '☁';
+
+  return (
+    <div>
+      <nav className="nav no-print">
+        <div className="nav-brand">
+          {logoB64 ? <img src={`data:image/png;base64,${logoB64}`} alt="Logo" className="nav-logo" /> : null}
+          <div className="nav-title">Centro Oeste<span>Implementos</span></div>
+        </div>
+        <div style={{display:'flex',alignItems:'center',gap:4}}>
+          <div className={`sync-btn ${syncStatus}`} onClick={manualSync} title={syncMsg || 'Clique para sincronizar com GitHub'}>
+            {syncIcon} <span style={{maxWidth:120,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{syncMsg || (ghSync.isConfigured() ? 'GitHub' : 'Configurar sync')}</span>
+          </div>
+          <div style={{cursor:'pointer',padding:'5px 8px',color:'#aaa',fontSize:16}} onClick={()=>setShowGhConfig(true)} title="Configurar GitHub">⚙</div>
+          <div className="nav-seller" onClick={() => setCurrentSeller(null)}>
+            <div className="nav-seller-icon">{currentSeller.initials}</div>
+            <div className="nav-seller-name">{currentSeller.name.split(' ')[0]}</div>
+          </div>
+        </div>
+      </nav>
+
+      <div className="tabs no-print">
+        {[{id:'dashboard',label:'📊 Dashboard'},{id:'nova',label:'➕ Nova Proposta'},{id:'historico',label:'📋 Histórico'},{id:'catalogo',label:'📦 Catálogo GTS + Jan'}].map(t => (
+          <div key={t.id} className={`tab ${tab===t.id?'active':''}`} onClick={()=>{setTab(t.id); if(t.id==='nova')setEditProposal(null);}}>
+            {t.label}
+          </div>
+        ))}
+      </div>
+
+      <div className="main">
+        {tab === 'dashboard' && <Dashboard proposals={proposals} sellers={sellers} />}
+        {tab === 'nova' && <ProposalForm proposal={editProposal} sellers={sellers} currentSeller={currentSeller}
+          proposals={proposals} onSave={saveProposal} onCancel={()=>setTab('historico')} logoB64={logoB64} />}
+        {tab === 'historico' && <HistoricoTab proposals={myProposals} sellers={sellers}
+          onEdit={(p)=>{setEditProposal(p);setTab('nova');}} onDelete={deleteProposal}
+          onStatusChange={(p)=>setShowStatusModal(p)} onPDF={(p)=>{
+            const s = sellers.find(x=>x.id===p.sellerId)||currentSeller;
+            generatePDF(p, s, logoB64);
+          }}
+          filterStatus={filterStatus} setFilterStatus={setFilterStatus}
+          filterSearch={filterSearch} setFilterSearch={setFilterSearch} />}
+        {tab === 'catalogo' && <CatalogoTab />}
+      </div>
+
+      {showStatusModal && (
+        <div className="modal-overlay" onClick={()=>setShowStatusModal(null)}>
+          <div className="modal" onClick={e=>e.stopPropagation()}>
+            <div className="modal-title">Alterar Status</div>
+            <p style={{fontSize:13,color:'#555',marginBottom:16}}>Proposta: <b>{showStatusModal.num}</b>  -  {showStatusModal.clientName}</p>
+            <div style={{display:'flex',flexDirection:'column',gap:8}}>
+              {STATUS_OPTIONS.map(s => (
+                <button key={s.value} className={`btn ${showStatusModal.status===s.value?'btn-primary':'btn-outline'}`}
+                  onClick={()=>updateStatus(showStatusModal.id, s.value)}>
+                  {s.label}
+                </button>
+              ))}
+            </div>
+            <div className="btn-group"><button className="btn btn-outline" onClick={()=>setShowStatusModal(null)}>Cancelar</button></div>
+          </div>
+        </div>
+      )}
+
+      {showGhConfig && (
+        <div className="modal-overlay" onClick={()=>setShowGhConfig(false)}>
+          <div className="modal gh-modal" onClick={e=>e.stopPropagation()}>
+            <div className="modal-title">☁ Sincronização GitHub</div>
+            <p style={{fontSize:12,color:'#666',marginBottom:16,lineHeight:1.5}}>
+              As propostas serão salvas automaticamente em um repositório GitHub, permitindo acesso de qualquer dispositivo.
+            </p>
+            <div className="gh-field">
+              <label>Token de Acesso Pessoal (PAT)</label>
+              <input type="password" value={ghToken} onChange={e=>setGhToken(e.target.value)}
+                placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" />
+              <div className="gh-help">Gere em: GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens (permissão: Contents read/write)</div>
+            </div>
+            <div className="gh-field">
+              <label>Usuário ou Organização GitHub</label>
+              <input value={ghOwner} onChange={e=>setGhOwner(e.target.value)} placeholder="seu-usuario" />
+            </div>
+            <div className="gh-field">
+              <label>Nome do Repositório</label>
+              <input value={ghRepo} onChange={e=>setGhRepo(e.target.value)} placeholder="centro-oeste-propostas" />
+            </div>
+            <hr className="gh-divider" />
+            <div style={{fontSize:11,color:'#888',marginBottom:14}}>
+              Os dados ficam em <code>data/proposals.json</code> no repositório. O Token fica salvo apenas neste navegador.
+            </div>
+            <div className="btn-group">
+              <button className="btn btn-primary" onClick={saveGhConfig} disabled={!ghToken||!ghOwner||!ghRepo}>
+                Salvar e Conectar
+              </button>
+              <button className="btn btn-outline" onClick={()=>{ ghSync.clearConfig(); setGhToken(''); setGhOwner(''); setGhRepo(''); setSyncStatus('idle'); setSyncMsg(''); setShowGhConfig(false); }}>
+                Desconectar
+              </button>
+              <button className="btn btn-outline" onClick={()=>setShowGhConfig(false)}>Cancelar</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============ LOGIN ============
+function LoginScreen({sellers, onSelect, showNewSeller, setShowNewSeller, newSellerName, setNewSellerName, addSeller, logoB64}) {
+  return (
+    <div className="login-screen">
+      <div className="login-card">
+        {logoB64 ? <img src={`data:image/png;base64,${logoB64}`} alt="Logo" className="login-logo" /> : <div style={{fontSize:40,marginBottom:20}}>🌾</div>}
+        <div className="login-title">Centro Oeste Implementos</div>
+        <div className="login-sub">Sistema de Propostas Comerciais<br/>Selecione seu nome para continuar</div>
+        {sellers.map(s => (
+          <button key={s.id} className="seller-btn" onClick={()=>onSelect(s)}>
+            <div className="seller-avatar">{s.initials}</div>
+            {s.name}
+          </button>
+        ))}
+        {showNewSeller ? (
+          <div style={{marginTop:12}}>
+            <input value={newSellerName} onChange={e=>setNewSellerName(e.target.value)}
+              placeholder="Nome completo do vendedor" onKeyDown={e=>e.key==='Enter'&&addSeller()} style={{marginBottom:8}} autoFocus />
+            <div className="btn-group" style={{justifyContent:'center'}}>
+              <button className="btn btn-primary" onClick={addSeller}>Adicionar</button>
+              <button className="btn btn-outline" onClick={()=>setShowNewSeller(false)}>Cancelar</button>
+            </div>
+          </div>
+        ) : (
+          <button className="btn btn-outline" style={{marginTop:12,width:'100%'}} onClick={()=>setShowNewSeller(true)}>
+            ＋ Adicionar Vendedor
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ============ DASHBOARD ============
+function Dashboard({proposals, sellers}) {
+  const total = proposals.length;
+  const aceito = proposals.filter(p=>p.status==='aceito').length;
+  const perdido = proposals.filter(p=>p.status==='perdido').length;
+  const aguardando = proposals.filter(p=>p.status==='aguardando'||!p.status).length;
+  const desistencia = proposals.filter(p=>p.status==='desistencia').length;
+
+  // By seller
+  const bySeller = sellers.map(s => ({
+    name: s.name.split(' ')[0],
+    total: proposals.filter(p=>p.sellerId===s.id).length,
+    aceito: proposals.filter(p=>p.sellerId===s.id&&p.status==='aceito').length,
+  }));
+  const maxSeller = Math.max(...bySeller.map(b=>b.total), 1);
+
+  // By brand/model
+  const byModel = {};
+  proposals.forEach(p => { if(p.model) { byModel[p.model] = (byModel[p.model]||0)+1; } });
+  const modelArr = Object.entries(byModel).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const maxModel = Math.max(...modelArr.map(m=>m[1]), 1);
+
+  // Value totals
+  const propTotal = (p) => {
+    if (p.items && p.items.length > 0)
+      return p.items.reduce((s,i)=>s+Math.max(0,parseCurrency(i.totalValue)-(i.tradeIns||[]).reduce((ss,t)=>ss+parseCurrency(t.value),0)),0);
+    return parseCurrency(p.totalValue);
+  };
+  const totalValue = proposals.filter(p=>p.status==='aceito').reduce((s,p)=>s+propTotal(p),0);
+  const pipeline = proposals.filter(p=>p.status==='aguardando'||!p.status).reduce((s,p)=>s+propTotal(p),0);
+
+  return (
+    <div>
+      <div className="kpi-grid">
+        <div className="kpi-card"><div className="kpi-label">Total de Propostas</div><div className="kpi-value">{total}</div></div>
+        <div className="kpi-card"><div className="kpi-label">Aceito / Faturado</div><div className="kpi-value" style={{color:'#0f5132'}}>{aceito}</div></div>
+        <div className="kpi-card vermelho"><div className="kpi-label">Perdidas</div><div className="kpi-value" style={{color:'#c0392b'}}>{perdido+desistencia}</div></div>
+        <div className="kpi-card amarelo"><div className="kpi-label">Aguardando</div><div className="kpi-value" style={{color:'#856404'}}>{aguardando}</div></div>
+        <div className="kpi-card azul"><div className="kpi-label">Valor Fechado</div><div className="kpi-value" style={{fontSize:18}}>{totalValue.toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0})}</div></div>
+        <div className="kpi-card"><div className="kpi-label">Pipeline</div><div className="kpi-value" style={{fontSize:18}}>{pipeline.toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0})}</div></div>
+      </div>
+
+      {total > 0 && (
+        <>
+          <div className="card">
+            <div className="card-title">Desempenho por Vendedor</div>
+            <div className="bar-chart">
+              {bySeller.filter(b=>b.total>0).map(b => (
+                <div key={b.name} className="bar-row">
+                  <div className="bar-label">{b.name}</div>
+                  <div className="bar-track"><div className="bar-fill" style={{width:`${b.total/maxSeller*100}%`}}></div></div>
+                  <div className="bar-val">{b.total}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {modelArr.length > 0 && (
+            <div className="card">
+              <div className="card-title">Propostas por Modelo</div>
+              <div className="bar-chart">
+                {modelArr.map(([model, count]) => (
+                  <div key={model} className="bar-row">
+                    <div className="bar-label">{model}</div>
+                    <div className="bar-track"><div className="bar-fill" style={{width:`${count/maxModel*100}%`, background:'var(--amarelo)'}}></div></div>
+                    <div className="bar-val">{count}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="card">
+            <div className="card-title">Status das Propostas</div>
+            <div className="kpi-grid" style={{marginBottom:0}}>
+              <div style={{textAlign:'center'}}><div style={{fontSize:32,fontWeight:800,color:'#0f5132'}}>{aceito}</div><div className="status status-aceito" style={{display:'block',marginTop:4,textAlign:'center'}}>Aceito/Faturado</div></div>
+              <div style={{textAlign:'center'}}><div style={{fontSize:32,fontWeight:800,color:'#856404'}}>{aguardando}</div><div className="status status-aguardando" style={{display:'block',marginTop:4,textAlign:'center'}}>Aguardando</div></div>
+              <div style={{textAlign:'center'}}><div style={{fontSize:32,fontWeight:800,color:'#c0392b'}}>{perdido}</div><div className="status status-perdido" style={{display:'block',marginTop:4,textAlign:'center'}}>Perdido</div></div>
+              <div style={{textAlign:'center'}}><div style={{fontSize:32,fontWeight:800,color:'#41464b'}}>{desistencia}</div><div className="status status-desistencia" style={{display:'block',marginTop:4,textAlign:'center'}}>Desistência</div></div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {total === 0 && (
+        <div className="card">
+          <div className="empty">
+            <div className="empty-icon">📊</div>
+            <div>Nenhuma proposta ainda.<br/>Crie sua primeira proposta!</div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============ PROPOSAL FORM ============
+const EMPTY_ITEM = () => ({
+  _id: Date.now().toString() + Math.random(),
+  product:'', brand:'GTS do Brasil', model:'', finame:'', ncm:'',
+  description:'', productImg:'', deliveryTime:'',
+  totalValue:'', paymentType:'PIX', installments:[], numInstallments:'',
+  photos:[], tradeIns:[],
+});
+
+const EMPTY_TRADEIN = () => ({ _id: Date.now().toString()+Math.random(), type:'', description:'', value:'', tipoUso:'avista', parcelas:[] });
+const EMPTY_TI_PARCELA = () => ({ _id: Date.now().toString()+Math.random(), valor:'', obs:'' });
+
+
+
+
+// ============ ESTADOS E CIDADES (datalist) ============
+const ESTADOS_LIST = [
+  'Mato Grosso','Acre','Alagoas','Amapa','Amazonas','Bahia','Ceara',
+  'Distrito Federal','Espirito Santo','Goias','Maranhao','Mato Grosso do Sul',
+  'Minas Gerais','Para','Paraiba','Parana','Pernambuco','Piaui',
+  'Rio de Janeiro','Rio Grande do Norte','Rio Grande do Sul','Rondonia',
+  'Roraima','Santa Catarina','Sao Paulo','Sergipe','Tocantins'
+];
+
+const CIDADES = {
+  'Mato Grosso': ['Lucas do Rio Verde','Sorriso','Sinop','Cuiaba','Varzea Grande','Rondonopolis','Tangara da Serra','Nova Mutum','Sapezal','Campo Novo do Parecis','Diamantino','Sao Jose do Rio Claro','Ipiranga do Norte','Tapurah','Nova Ubiratan','Santa Rita do Trivelato','Feliz Natal','Claudia','Vera','Juara','Juina','Colider','Matupa','Peixoto de Azevedo','Terra Nova do Norte','Alta Floresta','Caceres','Barra do Garcas','Primavera do Leste','Porto dos Gauchos','Brasnorte','Campos de Julio','Pontes e Lacerda','Mirassol dOeste','Jaciara','Dom Aquino','Jangada','Rosario Oeste','Chapada dos Guimaraes','Acorizal','Nossa Senhora do Livramento','Santo Antonio do Leverger','Pocone','Paranatinga','Poxoreo','Pedra Preta','Alto Araguaia','Alto Garcas','Tesouro','Canarana','Agua Boa','Nova Xavantina','Campinapolis','Santo Antonio do Leste','Querencia','Gaucha do Norte','Ribeirao Cascalheira','Sao Felix do Araguaia','Confresa','Vila Rica','Porto Alegre do Norte','Santa Terezinha','Nobres','Guarantã do Norte','Guarantia do Norte'],
+  'Goias': ['Goiania','Aparecida de Goiania','Anapolis','Rio Verde','Luziania','Aguas Lindas de Goias','Valparaiso de Goias','Trindade','Formosa','Novo Gama','Itumbiara','Senador Canedo','Catalao','Jatai','Mineiros','Caldas Novas','Inhumas','Goianesia','Niquelandia','Porangatu'],
+  'Mato Grosso do Sul': ['Campo Grande','Dourados','Tres Lagoas','Corumba','Ponta Pora','Naviraí','Sidrolandia','Nova Andradina','Aquidauana','Jardim','Amambai','Paranaiba','Bela Vista','Bonito','Cassilandia','Costa Rica','Coxim','Maracaju','Mundo Novo','Sonora'],
+  'Para': ['Belem','Ananindeua','Santarem','Maraba','Castanhal','Parauapebas','Altamira','Itaituba','Braganca','Abaetetuba','Barcarena','Tucurui'],
+  'Sao Paulo': ['Sao Paulo','Campinas','Guarulhos','Sao Bernardo do Campo','Santo Andre','Ribeirao Preto','Osasco','Sao Jose dos Campos','Sorocaba','Santos','Mogi das Cruzes','Piracicaba','Limeira','Jundiai','Bauru','Franca','Taubate','Presidente Prudente','Marilia','Sao Jose do Rio Preto'],
+  'Parana': ['Curitiba','Londrina','Maringa','Ponta Grossa','Cascavel','Sao Jose dos Pinhais','Foz do Iguacu','Colombo','Guarapuava','Paranagua','Araucaria','Toledo','Apucarana','Umuarama'],
+  'Minas Gerais': ['Belo Horizonte','Uberlandia','Contagem','Juiz de Fora','Betim','Montes Claros','Ribeirao das Neves','Uberaba','Governador Valadares','Ipatinga','Sete Lagoas','Divinopolis','Santa Luzia','Patos de Minas','Pocos de Caldas','Ubai'],
+  'Rio Grande do Sul': ['Porto Alegre','Caxias do Sul','Pelotas','Canoas','Santa Maria','Gravataí','Viamao','Novo Hamburgo','Sao Leopoldo','Rio Grande','Alvorada','Passo Fundo','Santa Cruz do Sul','Uruguaiana','Lajeado','Ijui'],
+  'Rondonia': ['Porto Velho','Ji-Parana','Ariquemes','Vilhena','Cacoal','Rolim de Moura','Guajara-Mirim','Jaru','Ouro Preto do Oeste'],
+  'Tocantins': ['Palmas','Araguaina','Gurupi','Porto Nacional','Paraiso do Tocantins','Colinas do Tocantins','Guarai'],
+  'Bahia': ['Salvador','Feira de Santana','Vitoria da Conquista','Camacari','Itabuna','Ilheus','Jequie','Teixeira de Freitas','Alagoinhas','Barreiras'],
+  'Amazonas': ['Manaus','Parintins','Itacoatiara','Manacapuru','Coari','Tefé','Tabatinga'],
+  'Maranhao': ['Sao Luis','Imperatriz','Sao Jose de Ribamar','Timon','Caxias','Codó','Paço do Lumiar'],
+  'Pernambuco': ['Recife','Jaboatao dos Guararapes','Olinda','Caruaru','Petrolina','Paulista','Camaragibe'],
+  'Ceara': ['Fortaleza','Caucaia','Juazeiro do Norte','Maracanau','Sobral','Crato'],
+  'Rio de Janeiro': ['Rio de Janeiro','Sao Goncalo','Duque de Caxias','Nova Iguacu','Niterói','Campos dos Goytacazes','Petropolis'],
+  'Espirito Santo': ['Vitoria','Vila Velha','Serra','Cariacica','Cachoeiro de Itapemirim','Linhares'],
+  'Minas Gerais': ['Belo Horizonte','Uberlandia','Contagem','Juiz de Fora','Betim','Montes Claros','Uberaba','Governador Valadares','Ipatinga','Sete Lagoas','Divinopolis','Patos de Minas','Pocos de Caldas'],
+  'Santa Catarina': ['Florianopolis','Joinville','Blumenau','Sao Jose','Criciuma','Chapeco','Itajai','Lages'],
+  'Piaui': ['Teresina','Parnaiba','Picos','Piripiri','Floriano'],
+  'Paraiba': ['Joao Pessoa','Campina Grande','Santa Rita','Patos','Bayeux'],
+  'Rio Grande do Norte': ['Natal','Mossoro','Parnamirim','Sao Goncalo do Amarante','Macaiba'],
+  'Alagoas': ['Maceio','Arapiraca','Rio Largo','Palmeira dos Indios','Uniao dos Palmares'],
+  'Sergipe': ['Aracaju','Nossa Senhora do Socorro','Lagarto','Itabaiana','Sao Cristovao'],
+  'Acre': ['Rio Branco','Cruzeiro do Sul','Sena Madureira','Tarauaca','Feijo'],
+  'Amapa': ['Macapa','Santana','Laranjal do Jari','Oiapoque','Mazagao'],
+  'Roraima': ['Boa Vista','Caracaraí','Rorainopolis','Mucajai'],
+  'Distrito Federal': ['Brasilia','Ceilandia','Taguatinga','Gama','Samambaia','Planaltina','Aguas Claras'],
+};
+const getCidades = (estado) => CIDADES[estado] || [];
+
+function ProposalForm({proposal, sellers, currentSeller, proposals, onSave, onCancel, logoB64}) {
+  const isEdit = !!proposal?.id;
+
+  // migrate old proposals (sem items) para novo formato
+  const migrateProposal = (p) => {
+    if (!p) return null;
+    if (p.items && p.items.length > 0) return p;
+    return {
+      ...p,
+      estado: p.estado || 'Mato Grosso',
+      docTipo: p.docTipo || 'cpf',
+      items: [{
+        _id: Date.now().toString(),
+        product: p.product||'', brand: p.brand||'GTS do Brasil', model: p.model||'',
+        finame: p.finame||'', ncm: p.ncm||'', description: p.description||'',
+        productImg: p.productImg||'', deliveryTime: p.deliveryTime||'',
+        totalValue: p.totalValue||'', paymentType: p.paymentType||'PIX',
+        installments: p.installments||[], numInstallments: p.numInstallments||'',
+        photos: p.photos||[], tradeIns: [],
+      }],
+    };
+  };
+
+  const [form, setForm] = useState(() => migrateProposal(proposal) || {
+    id: Date.now().toString(),
+    num: nextProposalNum(proposals),
+    date: new Date().toISOString().slice(0,10),
+    sellerId: currentSeller.id,
+    clientName:'', cpf:'', docTipo:'cpf', phone:'', farm:'', city:'', estado:'Mato Grosso',
+    validUntil:'', notes:'',
+    status:'aguardando',
+    items: [EMPTY_ITEM()],
+  });
+
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const [showCatalog, setShowCatalog] = useState(null);
+  const [catFilter, setCatFilter] = useState('');
+  const [brandFilter, setBrandFilter] = useState('');
+  const photoRefs = useRef([]);
+
+  const handleGeneratePDF = async () => {
+    setPdfLoading(true);
+    try {
+      const s = sellers.find(x=>x.id===form.sellerId)||currentSeller;
+      await generatePDF(form, s, logoB64);
+    } finally {
+      setPdfLoading(false);
+    }
+  };
+
+  const upd = (field, val) => setForm(f => ({...f, [field]: val}));
+
+  // ---- Item helpers ----
+  const updItem = (i, field, val) => setForm(f => {
+    const items = [...f.items];
+    items[i] = {...items[i], [field]: val};
+    return {...f, items};
+  });
+
+  const addItem = () => setForm(f => ({...f, items: [...f.items, EMPTY_ITEM()]}));
+
+  const removeItem = (i) => {
+    if (form.items.length === 1) return;
+    setForm(f => ({...f, items: f.items.filter((_,idx)=>idx!==i)}));
+  };
+
+  const selectProduct = (item, itemIdx) => {
+    updItem(itemIdx, '_patch', null);
+    setForm(f => {
+      const items = [...f.items];
+      items[itemIdx] = {...items[itemIdx],
+        product: item.cat, brand: item.brand || 'GTS do Brasil', model: item.name,
+        finame: item.finame, ncm: item.ncm,
+        description: item.desc, productImg: item.img||'',
+      };
+      return {...f, items};
+    });
+    setShowCatalog(null);
+  };
+
+  const setNumInstallments = (itemIdx, n) => {
+    const qty = Math.max(0, Math.min(60, parseInt(n)||0));
+    setForm(f => {
+      const items = [...f.items];
+      const current = items[itemIdx].installments || [];
+      const newInst = qty > current.length
+        ? [...current, ...Array.from({length: qty - current.length}, ()=>({value:'', date:'', note:''}))]
+        : current.slice(0, qty);
+      items[itemIdx] = {...items[itemIdx], numInstallments: qty, installments: newInst};
+      return {...f, items};
+    });
+  };
+
+  const updInstallment = (itemIdx, i, field, val) => {
+    setForm(f => {
+      const items = [...f.items];
+      const insts = [...(items[itemIdx].installments||[])];
+      insts[i] = {...insts[i], [field]: val};
+      items[itemIdx] = {...items[itemIdx], installments: insts};
+      return {...f, items};
+    });
+  };
+
+  const addTradeIn = (itemIdx) => {
+    setForm(f => {
+      const items = [...f.items];
+      items[itemIdx] = {...items[itemIdx], tradeIns: [...(items[itemIdx].tradeIns||[]), EMPTY_TRADEIN()]};
+      return {...f, items};
+    });
+  };
+
+  const updTradeIn = (itemIdx, tiIdx, field, val) => {
+    setForm(f => {
+      const items = [...f.items];
+      const tis = [...(items[itemIdx].tradeIns||[])];
+      tis[tiIdx] = {...tis[tiIdx], [field]: val};
+      items[itemIdx] = {...items[itemIdx], tradeIns: tis};
+      return {...f, items};
+    });
+  };
+
+  const removeTradeIn = (itemIdx, tiIdx) => {
+    setForm(f => {
+      const items = [...f.items];
+      items[itemIdx] = {...items[itemIdx], tradeIns: items[itemIdx].tradeIns.filter((_,x)=>x!==tiIdx)};
+      return {...f, items};
+    });
+  };
+
+  const addTiParcela = (itemIdx, tiIdx) => {
+    setForm(f => {
+      const items = [...f.items];
+      const tis = [...(items[itemIdx].tradeIns||[])];
+      tis[tiIdx] = {...tis[tiIdx], parcelas:[...(tis[tiIdx].parcelas||[]), EMPTY_TI_PARCELA()]};
+      items[itemIdx] = {...items[itemIdx], tradeIns: tis};
+      return {...f, items};
+    });
+  };
+
+  const updTiParcela = (itemIdx, tiIdx, pIdx, field, val) => {
+    setForm(f => {
+      const items = [...f.items];
+      const tis = [...(items[itemIdx].tradeIns||[])];
+      const parcs = [...(tis[tiIdx].parcelas||[])];
+      parcs[pIdx] = {...parcs[pIdx], [field]: val};
+      tis[tiIdx] = {...tis[tiIdx], parcelas: parcs};
+      items[itemIdx] = {...items[itemIdx], tradeIns: tis};
+      return {...f, items};
+    });
+  };
+
+  const removeTiParcela = (itemIdx, tiIdx, pIdx) => {
+    setForm(f => {
+      const items = [...f.items];
+      const tis = [...(items[itemIdx].tradeIns||[])];
+      tis[tiIdx] = {...tis[tiIdx], parcelas: tis[tiIdx].parcelas.filter((_,x)=>x!==pIdx)};
+      items[itemIdx] = {...items[itemIdx], tradeIns: tis};
+      return {...f, items};
+    });
+  };
+
+  const tradeInTotal = (item) => (item.tradeIns||[]).reduce((s,ti)=>s+parseCurrency(ti.value),0);
+  const netValue = (item) => Math.max(0, parseCurrency(item.totalValue) - tradeInTotal(item));
+  const tiParcelasTotal = (ti) => (ti.parcelas||[]).reduce((s,p)=>s+parseCurrency(p.valor),0);
+
+  const handlePhoto = (e, itemIdx) => {
+    const files = Array.from(e.target.files);
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        setForm(f => {
+          const items = [...f.items];
+          items[itemIdx] = {...items[itemIdx], photos: [...(items[itemIdx].photos||[]), ev.target.result]};
+          return {...f, items};
+        });
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const filteredCat = ALL_CATALOG.filter(item => {
+    const matchBrand = !brandFilter || item.brand === brandFilter;
+    const matchCat = !catFilter || item.cat.toLowerCase().includes(catFilter.toLowerCase()) || item.name.toLowerCase().includes(catFilter.toLowerCase());
+    return matchBrand && matchCat;
+  });
+  const cats = [...new Set(ALL_CATALOG.filter(i => !brandFilter || i.brand===brandFilter).map(i=>i.cat))];
+  const brands = [...new Set(ALL_CATALOG.map(i=>i.brand))];
+
+  return (
+    <div>
+      <div className="card">
+        <div className="card-title">{isEdit ? 'Editar Proposta' : 'Nova Proposta'}</div>
+
+        {/* Cabeçalho da proposta */}
+        <div className="form-grid">
+          <div className="form-group">
+            <label>Número da Proposta</label>
+            <input value={form.num} readOnly style={{background:'#f5f5f0'}} />
+          </div>
+          <div className="form-group">
+            <label>Data</label>
+            <input type="date" value={form.date} onChange={e=>upd('date',e.target.value)} />
+          </div>
+          <div className="form-group">
+            <label>Vendedor</label>
+            <select value={form.sellerId} onChange={e=>upd('sellerId',e.target.value)}>
+              {sellers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+            </select>
+          </div>
+          <div className="form-group">
+            <label>Validade da Proposta</label>
+            <input type="date" value={form.validUntil} onChange={e=>upd('validUntil',e.target.value)} />
+          </div>
+        </div>
+
+        {/* Dados do cliente */}
+        <div className="section-title">Dados do Cliente</div>
+        <div className="form-grid">
+          <div className="form-group full">
+            <label>Nome do Cliente *</label>
+            <input value={form.clientName} onChange={e=>upd('clientName',e.target.value)} placeholder="Nome completo" />
+          </div>
+          <div className="form-group">
+            <label style={{display:'flex',alignItems:'center',gap:8,marginBottom:4}}>
+              <span>CPF / CNPJ</span>
+              <span style={{display:'flex',gap:0,borderRadius:12,overflow:'hidden',border:'1px solid var(--verde)',fontSize:10,fontWeight:700}}>
+                <button type="button"
+                  onClick={()=>{ upd('docTipo','cpf'); upd('cpf',''); }}
+                  style={{padding:'2px 10px',border:'none',cursor:'pointer',background:(!form.docTipo||form.docTipo==='cpf')?'var(--verde)':'transparent',color:(!form.docTipo||form.docTipo==='cpf')?'white':'var(--verde)'}}>
+                  CPF
+                </button>
+                <button type="button"
+                  onClick={()=>{ upd('docTipo','cnpj'); upd('cpf',''); }}
+                  style={{padding:'2px 10px',border:'none',cursor:'pointer',background:form.docTipo==='cnpj'?'var(--verde)':'transparent',color:form.docTipo==='cnpj'?'white':'var(--verde)'}}>
+                  CNPJ
+                </button>
+              </span>
+            </label>
+            <input
+              value={form.cpf}
+              onChange={e=>upd('cpf', maskDoc(e.target.value, form.docTipo))}
+              placeholder={form.docTipo==='cnpj' ? '00.000.000/0000-00' : '000.000.000-00'}
+              maxLength={form.docTipo==='cnpj' ? 18 : 14}
+              inputMode="numeric"
+            />
+          </div>
+          <div className="form-group">
+            <label>Telefone</label>
+            <input value={form.phone} onChange={e=>upd('phone', maskPhone(e.target.value))} placeholder="(00) 00000-0000" maxLength={15} />
+          </div>
+          <div className="form-group">
+            <label>Fazenda</label>
+            <input value={form.farm} onChange={e=>upd('farm',e.target.value)} placeholder="Nome da fazenda" />
+          </div>
+          <div className="form-group">
+            <label>Estado</label>
+            <select value={form.estado||'Mato Grosso'} onChange={e=>{upd('estado',e.target.value); upd('city','');}}>
+              {ESTADOS_LIST.map(uf=><option key={uf} value={uf}>{uf}</option>)}
+            </select>
+          </div>
+          <div className="form-group">
+            <label>Cidade</label>
+            <input
+              list={`cidades-${form.estado||'Mato Grosso'}`}
+              value={form.city||''}
+              onChange={e=>upd('city',e.target.value)}
+              placeholder="Digite para buscar..."
+              autoComplete="off"
+            />
+            <datalist id={`cidades-${form.estado||'Mato Grosso'}`}>
+              {getCidades(form.estado||'Mato Grosso').map(c=><option key={c} value={c}/>)}
+            </datalist>
+          </div>
+        </div>
+
+        {/* ITENS */}
+        {form.items.map((item, itemIdx) => (
+          <div key={item._id || itemIdx} style={{border:'2px solid var(--verde)',borderRadius:10,padding:16,marginTop:20,position:'relative'}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+              <div style={{fontWeight:700,fontSize:15,color:'var(--verde)'}}>
+                📦 Item {itemIdx+1}{item.model ? `  -  ${item.model}` : ''}
+              </div>
+              {form.items.length > 1 && (
+                <button className="btn btn-danger btn-sm" onClick={()=>removeItem(itemIdx)}>🗑 Remover Item</button>
+              )}
+            </div>
+
+            {/* Produto */}
+            <div style={{marginBottom:10}}>
+              <button className="btn btn-secondary" onClick={()=>{setCatFilter('');setBrandFilter('');setShowCatalog(itemIdx);}}>
+                📦 Selecionar do Catálogo GTS / Jan
+              </button>
+            </div>
+            <div className="form-grid">
+              <div className="form-group">
+                <label>Categoria / Produto</label>
+                <input value={item.product} onChange={e=>updItem(itemIdx,'product',e.target.value)} placeholder="Ex: Plataforma de Milho" />
+              </div>
+              <div className="form-group">
+                <label>Marca</label>
+                <input value={item.brand} onChange={e=>updItem(itemIdx,'brand',e.target.value)} />
+              </div>
+              <div className="form-group">
+                <label>Modelo</label>
+                <input value={item.model} onChange={e=>updItem(itemIdx,'model',e.target.value)} placeholder="Ex: Produttiva" />
+              </div>
+              <div className="form-group">
+                <label>Código FINAME</label>
+                <input value={item.finame} onChange={e=>updItem(itemIdx,'finame',e.target.value)} placeholder="0000.00.00.00" />
+              </div>
+              <div className="form-group">
+                <label>NCM - Classificação Fiscal</label>
+                <input value={item.ncm} onChange={e=>updItem(itemIdx,'ncm',e.target.value)} placeholder="0000.00.00" />
+              </div>
+              <div className="form-group">
+                <label>Prazo de Entrega</label>
+                <input value={item.deliveryTime} onChange={e=>updItem(itemIdx,'deliveryTime',e.target.value)} placeholder="Ex: 30 dias, Imediato" />
+              </div>
+              <div className="form-group full">
+                <label>Descrição do Produto</label>
+                <textarea value={item.description} onChange={e=>updItem(itemIdx,'description',e.target.value)} rows={4} placeholder="Descrição detalhada do produto..." />
+              </div>
+              <div className="form-group full">
+                <label>Foto do Produto (catálogo GTS)</label>
+                <div style={{display:'flex',gap:12,alignItems:'flex-start',flexWrap:'wrap'}}>
+                  {item.productImg && (
+                    <div style={{position:'relative',flexShrink:0}}>
+                      <img src={item.productImg} alt="Produto" style={{height:100,width:'auto',maxWidth:180,objectFit:'cover',borderRadius:8,border:'2px solid var(--verde)'}}
+                        onError={e=>{e.target.style.display='none';}} />
+                      <button onClick={()=>updItem(itemIdx,'productImg','')}
+                        style={{position:'absolute',top:-6,right:-6,background:'var(--vermelho)',color:'white',border:'none',borderRadius:'50%',width:20,height:20,cursor:'pointer',fontSize:12,display:'flex',alignItems:'center',justifyContent:'center'}}>✕</button>
+                    </div>
+                  )}
+                  <div style={{flex:1,minWidth:180}}>
+                    <input value={item.productImg} onChange={e=>updItem(itemIdx,'productImg',e.target.value)}
+                      placeholder="URL da imagem (auto ao selecionar catálogo)" style={{marginBottom:6}} />
+                    <div style={{fontSize:11,color:'var(--text2)'}}>💡 Selecione do catálogo GTS para preencher automaticamente.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Fotos da galeria */}
+            <div className="section-title" style={{marginTop:8}}>Fotos do Equipamento</div>
+            <div className="photo-area" onClick={()=>photoRefs.current[itemIdx]?.click()}>
+              <div>📷 Toque para adicionar fotos da galeria</div>
+              <input ref={el=>photoRefs.current[itemIdx]=el} type="file" accept="image/*" multiple style={{display:'none'}}
+                onChange={e=>handlePhoto(e,itemIdx)} />
+            </div>
+            {(item.photos||[]).length > 0 && (
+              <div className="photo-preview">
+                {item.photos.map((ph, pi) => (
+                  <div key={pi} style={{position:'relative'}}>
+                    <img src={ph} className="photo-thumb" alt={`foto ${pi+1}`} />
+                    <button onClick={()=>{
+                      setForm(f=>{const items=[...f.items];items[itemIdx]={...items[itemIdx],photos:items[itemIdx].photos.filter((_,x)=>x!==pi)};return{...f,items};});
+                    }} style={{position:'absolute',top:-4,right:-4,background:'red',color:'white',border:'none',borderRadius:'50%',width:18,height:18,cursor:'pointer',fontSize:11,lineHeight:'18px',padding:0}}>✕</button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Valor e Pagamento */}
+            <div className="section-title" style={{marginTop:8}}>Valor e Pagamento</div>
+            <div className="form-grid">
+              <div className="form-group">
+                <label>Valor Total</label>
+                <input value={item.totalValue} onChange={e=>updItem(itemIdx,'totalValue',maskCurrency(e.target.value))} placeholder="R$ 0,00" inputMode="numeric" />
+              </div>
+              <div className="form-group">
+                <label>Forma de Pagamento</label>
+                <div className="payment-type-grid" style={{marginTop:4}}>
+                  {PAYMENT_TYPES.map(pt => (
+                    <div key={pt} className={`payment-chip ${item.paymentType===pt?'active':''}`} onClick={()=>updItem(itemIdx,'paymentType',pt)}>{pt}</div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {item.paymentType === 'Parcelado' && (() => {
+              const totalNum = parseCurrency(item.totalValue);
+              const somaParc = (item.installments||[]).reduce((s,inst)=>s+parseCurrency(inst.value),0);
+              const diff = Math.abs(totalNum - somaParc);
+              const valid = totalNum > 0 && diff < 0.02;
+              return (
+                <div style={{marginTop:12}}>
+                  <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:10,flexWrap:'wrap'}}>
+                    <label style={{fontSize:11,fontWeight:700,color:'#555',textTransform:'uppercase',letterSpacing:'0.5px',marginBottom:0}}>Nº de Parcelas</label>
+                    <input type="number" min="1" max="60" value={item.numInstallments||''} onChange={e=>setNumInstallments(itemIdx,e.target.value)}
+                      style={{width:80,textAlign:'center',fontWeight:700}} placeholder="Qtd." />
+                    {totalNum > 0 && (item.installments||[]).length > 0 && (
+                      <span style={{fontSize:12,fontWeight:600,color:valid?'#2d6a2d':'#c0392b',background:valid?'#eafaea':'#fde8e8',padding:'4px 10px',borderRadius:6}}>
+                        {valid ? '✅ Soma conferida' : `⚠️ Soma ${somaParc.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})} ≠ Total ${totalNum.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}`}
+                      </span>
+                    )}
+                  </div>
+                  {(item.installments||[]).map((inst, i) => (
+                    <div key={i} className="installment-row">
+                      <span style={{fontSize:13,fontWeight:700,color:'var(--verde)',minWidth:28}}>#{i+1}</span>
+                      <div><input value={inst.value} onChange={e=>updInstallment(itemIdx,i,'value',maskCurrency(e.target.value))} placeholder="R$ 0,00" inputMode="numeric" style={{width:130}} /></div>
+                      <div><input type="date" value={inst.date} onChange={e=>updInstallment(itemIdx,i,'date',e.target.value)} /></div>
+                      <div><input value={inst.note||''} onChange={e=>updInstallment(itemIdx,i,'note',e.target.value)} placeholder="Obs." /></div>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
+
+            {/* ---- ITENS USADOS (Trade-in) ---- */}
+            {(() => {
+              const tis = item.tradeIns || [];
+              const tiTotal = tradeInTotal(item);
+              const newVal = parseCurrency(item.totalValue);
+              const net = netValue(item);
+              return (
+                <div style={{marginTop:16,borderTop:'2px dashed #c0392b',paddingTop:14}}>
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
+                    <span style={{fontWeight:700,fontSize:13,color:'#c0392b'}}>🔄 Equipamentos Usados para Troca/Abatimento</span>
+                    <button className="btn btn-sm" onClick={()=>addTradeIn(itemIdx)}
+                      style={{background:'#c0392b',color:'white',border:'none',borderRadius:6,padding:'4px 12px',cursor:'pointer',fontSize:12,fontWeight:700}}>
+                      + Adicionar Usado
+                    </button>
+                  </div>
+
+                  {tis.length === 0 && (
+                    <div style={{color:'#999',fontSize:12,fontStyle:'italic',padding:'8px 0'}}>
+                      Nenhum equipamento usado informado. Clique em "+ Adicionar Usado" para incluir.
+                    </div>
+                  )}
+
+                  {tis.map((ti, tiIdx) => {
+                    const tiVal = parseCurrency(ti.value);
+                    const tiParcTotal = tiParcelasTotal(ti);
+                    const tiParcDiff = Math.abs(tiVal - tiParcTotal);
+                    const tiParcOk = tiParcDiff < 0.02;
+                    return (
+                    <div key={ti._id||tiIdx} style={{background:'#fdf0f0',border:'1px solid #e8b4b4',borderRadius:8,padding:12,marginBottom:8}}>
+                      {/* Linha principal: tipo / descrição / valor / remover */}
+                      <div style={{display:'flex',gap:8,flexWrap:'wrap',alignItems:'flex-start'}}>
+                        <div style={{flex:'0 0 150px'}}>
+                          <label style={{fontSize:11,fontWeight:600,color:'#c0392b',display:'block',marginBottom:3}}>Tipo</label>
+                          <select value={ti.type} onChange={e=>updTradeIn(itemIdx,tiIdx,'type',e.target.value)}
+                            style={{width:'100%',padding:'6px 8px',border:'1px solid #e8b4b4',borderRadius:6,fontSize:13}}>
+                            <option value="">Selecione...</option>
+                            <option>Trator</option>
+                            <option>Colheitadeira</option>
+                            <option>Plataforma</option>
+                            <option>Escavadeira</option>
+                            <option>Carreta Graneleira</option>
+                            <option>Pulverizador</option>
+                            <option>Plantadeira</option>
+                            <option>Outro Implemento</option>
+                            <option>Outro</option>
+                          </select>
+                        </div>
+                        <div style={{flex:1,minWidth:160}}>
+                          <label style={{fontSize:11,fontWeight:600,color:'#c0392b',display:'block',marginBottom:3}}>Descrição (marca/modelo/ano)</label>
+                          <input value={ti.description} onChange={e=>updTradeIn(itemIdx,tiIdx,'description',e.target.value)}
+                            placeholder="Ex: John Deere 7200, 2018, 2.500h"
+                            style={{width:'100%',padding:'6px 8px',border:'1px solid #e8b4b4',borderRadius:6,fontSize:13,boxSizing:'border-box'}} />
+                        </div>
+                        <div style={{flex:'0 0 140px'}}>
+                          <label style={{fontSize:11,fontWeight:600,color:'#c0392b',display:'block',marginBottom:3}}>Valor de Avaliação</label>
+                          <input value={ti.value} onChange={e=>updTradeIn(itemIdx,tiIdx,'value',maskCurrency(e.target.value))}
+                            placeholder="R$ 0,00" inputMode="numeric"
+                            style={{width:'100%',padding:'6px 8px',border:'1px solid #e8b4b4',borderRadius:6,fontSize:13,fontWeight:700,boxSizing:'border-box'}} />
+                        </div>
+                        <div style={{paddingTop:20}}>
+                          <button onClick={()=>removeTradeIn(itemIdx,tiIdx)}
+                            style={{background:'#c0392b',color:'white',border:'none',borderRadius:6,padding:'6px 10px',cursor:'pointer',fontSize:12}}>✕</button>
+                        </div>
+                      </div>
+
+                      {/* Como será aplicado o usado */}
+                      {tiVal > 0 && (
+                        <div style={{marginTop:10,paddingTop:10,borderTop:'1px dashed #e8b4b4'}}>
+                          <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:8,flexWrap:'wrap'}}>
+                            <span style={{fontSize:11,fontWeight:700,color:'#c0392b'}}>💰 Como será aplicado:</span>
+                            <div style={{display:'flex',gap:4}}>
+                              <button onClick={()=>updTradeIn(itemIdx,tiIdx,'tipoUso','avista')}
+                                style={{padding:'4px 12px',fontSize:11,fontWeight:700,borderRadius:16,border:'none',cursor:'pointer',
+                                  background: (ti.tipoUso||'avista')==='avista' ? '#c0392b' : '#f5d0d0',
+                                  color: (ti.tipoUso||'avista')==='avista' ? 'white' : '#c0392b'}}>
+                                💵 À Vista
+                              </button>
+                              <button onClick={()=>updTradeIn(itemIdx,tiIdx,'tipoUso','parcelas')}
+                                style={{padding:'4px 12px',fontSize:11,fontWeight:700,borderRadius:16,border:'none',cursor:'pointer',
+                                  background: (ti.tipoUso||'avista')==='parcelas' ? '#c0392b' : '#f5d0d0',
+                                  color: (ti.tipoUso||'avista')==='parcelas' ? 'white' : '#c0392b'}}>
+                                📅 Parcelado
+                              </button>
+                            </div>
+                            {(ti.tipoUso||'avista')==='avista' && (
+                              <span style={{fontSize:11,color:'#888',fontStyle:'italic'}}>Desconto integral no valor total</span>
+                            )}
+                          </div>
+
+                          {/* Tabela de parcelas do usado */}
+                          {(ti.tipoUso||'avista')==='parcelas' && (
+                            <div style={{background:'#fff5f5',border:'1px solid #f0c0c0',borderRadius:6,padding:10}}>
+                              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
+                                <span style={{fontSize:11,fontWeight:700,color:'#c0392b'}}>📋 Distribuição do Usado nas Parcelas</span>
+                                <button onClick={()=>addTiParcela(itemIdx,tiIdx)}
+                                  style={{background:'#c0392b',color:'white',border:'none',borderRadius:6,padding:'3px 10px',cursor:'pointer',fontSize:11,fontWeight:700}}>
+                                  + Parcela
+                                </button>
+                              </div>
+
+                              {(ti.parcelas||[]).length === 0 && (
+                                <div style={{color:'#aaa',fontSize:11,fontStyle:'italic',textAlign:'center',padding:'6px 0'}}>
+                                  Clique em "+ Parcela" para definir como o usado será descontado
+                                </div>
+                              )}
+
+                              {(ti.parcelas||[]).map((parc, pIdx) => (
+                                <div key={parc._id||pIdx} style={{display:'flex',gap:6,alignItems:'center',marginBottom:6,flexWrap:'wrap'}}>
+                                  <span style={{fontSize:11,color:'#c0392b',fontWeight:700,minWidth:22}}>{pIdx+1}ª</span>
+                                  <div style={{flex:'0 0 130px'}}>
+                                    <input value={parc.valor} onChange={e=>updTiParcela(itemIdx,tiIdx,pIdx,'valor',maskCurrency(e.target.value))}
+                                      placeholder="R$ 0,00" inputMode="numeric"
+                                      style={{width:'100%',padding:'5px 8px',border:'1px solid #e8b4b4',borderRadius:6,fontSize:12,fontWeight:700,boxSizing:'border-box'}} />
+                                  </div>
+                                  <div style={{flex:1,minWidth:120}}>
+                                    <input value={parc.obs} onChange={e=>updTiParcela(itemIdx,tiIdx,pIdx,'obs',e.target.value)}
+                                      placeholder="Obs: ex. 50% na 1ª parcela, Entrada..."
+                                      style={{width:'100%',padding:'5px 8px',border:'1px solid #e8b4b4',borderRadius:6,fontSize:12,boxSizing:'border-box'}} />
+                                  </div>
+                                  <button onClick={()=>removeTiParcela(itemIdx,tiIdx,pIdx)}
+                                    style={{background:'#e88',color:'white',border:'none',borderRadius:6,padding:'5px 8px',cursor:'pointer',fontSize:11}}>✕</button>
+                                </div>
+                              ))}
+
+                              {(ti.parcelas||[]).length > 0 && (
+                                <div style={{marginTop:6,paddingTop:6,borderTop:'1px solid #f0c0c0',display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:6}}>
+                                  <span style={{fontSize:11,color:'#666'}}>
+                                    Total distribuído: <strong style={{color: tiParcOk ? '#2d6a2d' : '#c0392b'}}>{fmtCurrency(tiParcTotal)}</strong>
+                                    {' / '}Valor usado: <strong>{fmtCurrency(ti.value)}</strong>
+                                  </span>
+                                  {tiParcOk
+                                    ? <span style={{fontSize:11,color:'#2d6a2d',fontWeight:700}}>✅ Conferido</span>
+                                    : <span style={{fontSize:11,color:'#c0392b',fontWeight:700}}>⚠️ Diferença: {fmtCurrency(Math.abs(tiVal-tiParcTotal))}</span>
+                                  }
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    );
+                  })}
+
+                  {/* Mini-resumo de valores do item */}
+                  {newVal > 0 && (
+                    <div style={{marginTop:12,background:'#1a1a1a',borderRadius:8,padding:'12px 14px'}}>
+                      <div style={{display:'flex',justifyContent:'space-between',marginBottom:6}}>
+                        <span style={{color:'#aaa',fontSize:13}}>Valor do Equipamento Novo</span>
+                        <span style={{color:'#e8a020',fontWeight:700,fontSize:13}}>{fmtCurrency(item.totalValue)}</span>
+                      </div>
+                      {tis.length > 0 && tis.map((ti, tiIdx) => {
+                        const tiV = parseCurrency(ti.value);
+                        const isParcelas = (ti.tipoUso||'avista')==='parcelas';
+                        const nomeUsado = [ti.type, ti.description].filter(Boolean).join('  -  ') || 'Usado';
+                        return (
+                        <div key={tiIdx} style={{marginBottom:6}}>
+                          {/* Linha principal do usado */}
+                          <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',gap:4}}>
+                            <span style={{color:'#e88080',fontSize:12,flex:1}}>
+                              🔄 <strong>{nomeUsado}</strong>
+                              {' '}
+                              <span style={{background: isParcelas ? '#7b2020' : '#5a2020',color:'#ffaaaa',borderRadius:10,padding:'1px 7px',fontSize:10,fontWeight:700}}>
+                                {isParcelas ? '📅 Parcelado' : '💵 À Vista'}
+                              </span>
+                            </span>
+                            <span style={{color:'#e88080',fontWeight:700,fontSize:13,whiteSpace:'nowrap'}}>
+                              {tiV > 0 ? `(${fmtCurrency(ti.value)})` : ' - '}
+                            </span>
+                          </div>
+                          {/* Sub-parcelas do usado (quando parcelado) */}
+                          {isParcelas && (ti.parcelas||[]).length > 0 && (
+                            <div style={{marginTop:4,paddingLeft:14,borderLeft:'2px solid #5a2020'}}>
+                              {ti.parcelas.map((parc, pIdx) => (
+                                <div key={pIdx} style={{display:'flex',justifyContent:'space-between',marginBottom:2}}>
+                                  <span style={{color:'#c87070',fontSize:11}}>
+                                    {pIdx+1}ª{parc.obs ? `  -  ${parc.obs}` : ''}
+                                  </span>
+                                  <span style={{color:'#c87070',fontSize:11,fontWeight:600}}>
+                                    {parseCurrency(parc.valor)>0 ? `(${fmtCurrency(parc.valor)})` : ' - '}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        );
+                      })}
+                      {tis.length > 0 && (
+                        <>
+                          <div style={{borderTop:'1px solid #444',margin:'8px 0'}} />
+                          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                            <span style={{color:'white',fontWeight:700,fontSize:14}}>💵 Valor Líquido a Pagar</span>
+                            <span style={{color:'#4caf50',fontWeight:800,fontSize:18}}>{fmtCurrency(net)}</span>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+          </div>
+        ))}
+        {/* Botão adicionar item */}
+        <div style={{textAlign:'center',margin:'16px 0'}}>
+          <button className="btn btn-outline" onClick={addItem} style={{borderStyle:'dashed',fontSize:14}}>
+            ➕ Adicionar Outro Item à Proposta
+          </button>
+        </div>
+
+        {/* Resumo de valores */}
+        {(() => {
+          const itensComValor = form.items.filter(i => parseCurrency(i.totalValue) > 0);
+          if (itensComValor.length === 0) return null;
+          const grandBruto = form.items.reduce((s,i) => s + parseCurrency(i.totalValue), 0);
+          const grandTradeIn = form.items.reduce((s,i) => s + tradeInTotal(i), 0);
+          const grandLiquido = form.items.reduce((s,i) => s + netValue(i), 0);
+          const hasTradeIns = grandTradeIn > 0;
+          return (
+            <div style={{background:'#1a1a1a',borderRadius:10,padding:16,marginTop:16,marginBottom:4}}>
+              <div style={{color:'#e8a020',fontWeight:700,fontSize:13,textTransform:'uppercase',letterSpacing:'0.5px',marginBottom:10}}>
+                💰 Resumo da Proposta
+              </div>
+              {form.items.map((item, i) => {
+                const ti = tradeInTotal(item);
+                const nv = netValue(item);
+                return (
+                  <div key={i} style={{marginBottom:8,padding:'8px 10px',borderRadius:7,background:'rgba(255,255,255,0.06)'}}>
+                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                      <span style={{color:'#ccc',fontSize:13}}>Item {i+1}{item.model ? `  -  ${item.model}` : ''}</span>
+                      <span style={{color:'#e8a020',fontWeight:700,fontSize:13}}>{parseCurrency(item.totalValue)>0 ? fmtCurrency(item.totalValue) : ' - '}</span>
+                    </div>
+                    {ti > 0 && (
+                      <>
+                        {(item.tradeIns||[]).map((t,ti2)=>{
+                          const tV = parseCurrency(t.value);
+                          const tiIsParcelas = (t.tipoUso||'avista')==='parcelas';
+                          const nomeT = [t.type, t.description].filter(Boolean).join('  -  ') || 'Usado';
+                          return (
+                          <div key={ti2} style={{marginTop:4}}>
+                            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:4}}>
+                              <span style={{color:'#e88080',fontSize:11,flex:1}}>
+                                🔄 <strong style={{fontSize:12}}>{nomeT}</strong>
+                                {' '}
+                                <span style={{background: tiIsParcelas ? '#5a1a1a':'#3a1a1a',color:'#ffaaaa',borderRadius:8,padding:'1px 6px',fontSize:9,fontWeight:700}}>
+                                  {tiIsParcelas ? '📅 Parc.' : '💵 À Vista'}
+                                </span>
+                              </span>
+                              <span style={{color:'#e88080',fontSize:11,fontWeight:700,whiteSpace:'nowrap'}}>
+                                {tV>0?`(${fmtCurrency(t.value)})`:''}
+                              </span>
+                            </div>
+                            {tiIsParcelas && (t.parcelas||[]).length > 0 && (
+                              <div style={{paddingLeft:12,borderLeft:'2px solid #5a2020',marginTop:2}}>
+                                {t.parcelas.map((parc,pIdx)=>(
+                                  <div key={pIdx} style={{display:'flex',justifyContent:'space-between',marginBottom:1}}>
+                                    <span style={{color:'#c07070',fontSize:10}}>{pIdx+1}ª{parc.obs?`  -  ${parc.obs}`:''}</span>
+                                    <span style={{color:'#c07070',fontSize:10,fontWeight:600}}>{parseCurrency(parc.valor)>0?`(${fmtCurrency(parc.valor)})`:''}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                          );
+                        })}
+                        <div style={{display:'flex',justifyContent:'space-between',marginTop:6,paddingTop:4,borderTop:'1px solid #333'}}>
+                          <span style={{color:'#4caf50',fontSize:12,fontWeight:700}}>💵 Líquido Item {i+1}</span>
+                          <span style={{color:'#4caf50',fontSize:13,fontWeight:700}}>{fmtCurrency(nv)}</span>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+              {form.items.length > 1 && (
+                <div style={{borderTop:'1px solid #444',marginTop:6,paddingTop:10}}>
+                  {hasTradeIns && (
+                    <>
+                      <div style={{display:'flex',justifyContent:'space-between',marginBottom:5}}>
+                        <span style={{color:'#aaa',fontSize:13}}>Subtotal Bruto</span>
+                        <span style={{color:'#e8a020',fontWeight:600,fontSize:13}}>{fmtCurrency(grandBruto)}</span>
+                      </div>
+                      <div style={{display:'flex',justifyContent:'space-between',marginBottom:8}}>
+                        <span style={{color:'#e88080',fontSize:13}}>(-) Total Usados</span>
+                        <span style={{color:'#e88080',fontWeight:600,fontSize:13}}>({fmtCurrency(grandTradeIn)})</span>
+                      </div>
+                    </>
+                  )}
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                    <span style={{color:'white',fontWeight:700,fontSize:15}}>TOTAL {hasTradeIns?'LÍQUIDO ':''}GERAL</span>
+                    <span style={{color:'#4caf50',fontWeight:800,fontSize:22}}>{fmtCurrency(grandLiquido)}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })()}
+
+        {/* Observações gerais */}
+        <div className="section-title">Observações Gerais</div>
+        <div className="form-group">
+          <textarea value={form.notes} onChange={e=>upd('notes',e.target.value)} rows={3} placeholder="Observações adicionais sobre a proposta..." />
+        </div>
+
+        {/* Botões */}
+        <div className="btn-group">
+          <button className="btn btn-primary" onClick={()=>{
+            let ok = true;
+            for (const item of form.items) {
+              if (item.paymentType === 'Parcelado' && (item.installments||[]).length > 0) {
+                const totalNum = parseCurrency(item.totalValue);
+                const somaParc = (item.installments||[]).reduce((s,inst)=>s+parseCurrency(inst.value),0);
+                if (Math.abs(totalNum - somaParc) >= 0.02) {
+                  const idx = form.items.indexOf(item);
+                  alert(`❌ Item ${idx+1} (${item.model||'sem modelo'}): soma das parcelas (${somaParc.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}) difere do valor total (${totalNum.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}). Corrija antes de salvar.`);
+                  ok = false; break;
+                }
+              }
+            }
+            // Validar distribuição dos usados
+            if (ok) {
+              for (const item of form.items) {
+                for (const ti of (item.tradeIns||[])) {
+                  if ((ti.tipoUso||'avista')==='parcelas' && (ti.parcelas||[]).length > 0) {
+                    const tiV = parseCurrency(ti.value);
+                    const tiP = (ti.parcelas||[]).reduce((s,p)=>s+parseCurrency(p.valor),0);
+                    if (Math.abs(tiV - tiP) >= 0.02) {
+                      const idx = form.items.indexOf(item);
+                      alert(`❌ Item ${idx+1}  -  usado "${ti.description||ti.type||'Sem nome'}": soma das parcelas do usado (${tiP.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}) difere do valor do usado (${tiV.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}). Corrija antes de salvar.`);
+                      ok = false; break;
+                    }
+                  }
+                }
+                if (!ok) break;
+              }
+            }
+            if (ok) onSave(form);
+          }}>
+            💾 {isEdit?'Atualizar':'Salvar'} Proposta
+          </button>
+          <button className="btn btn-secondary" onClick={handleGeneratePDF} disabled={pdfLoading} style={{opacity:pdfLoading?0.7:1}}>
+            {pdfLoading ? '⏳ Carregando imagens...' : '📄 Gerar PDF'}
+          </button>
+          {isEdit && <button className="btn btn-outline" onClick={onCancel}>Cancelar</button>}
+        </div>
+      </div>
+
+      {showCatalog !== null && (
+        <div className="modal-overlay" onClick={()=>setShowCatalog(null)}>
+          <div className="modal" style={{maxWidth:740}} onClick={e=>e.stopPropagation()}>
+            <div className="modal-title">📦 Catálogo de Produtos  -  Item {showCatalog+1}</div>
+            <div style={{display:'flex',gap:8,marginBottom:12,flexWrap:'wrap'}}>
+              <select value={brandFilter} onChange={e=>{setBrandFilter(e.target.value);setCatFilter('');}} style={{flex:'0 0 170px'}}>
+                <option value="">🏭 Todas as marcas</option>
+                {brands.map(b => <option key={b} value={b}>{b}</option>)}
+              </select>
+              <select value={catFilter} onChange={e=>setCatFilter(e.target.value)} style={{flex:1,minWidth:180}}>
+                <option value="">Todas as Categorias</option>
+                {cats.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div className="catalog-grid" style={{maxHeight:'60vh',overflowY:'auto'}}>
+              {filteredCat.map(item => (
+                <div key={item.id||item.name} className="catalog-card" onClick={()=>selectProduct(item, showCatalog)}>
+                  {item.img && <img src={item.img} alt={item.name} className="catalog-img" onError={e=>{e.target.style.display='none';}} />}
+                  {!item.img && (
+                    <div style={{height:80,background:'linear-gradient(135deg,#1a3a1a,#2d6a2d)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:28,borderRadius:'6px 6px 0 0'}}>
+                      {item.brand==='Jan'?'🔴':'🟢'}
+                    </div>
+                  )}
+                  <div className="catalog-info">
+                    <div className="catalog-name">{item.name}</div>
+                    <div className="catalog-cat">{item.cat}</div>
+                    <div style={{fontSize:10,color:'#aaa',marginTop:2,fontWeight:600}}>{item.brand}</div>
+                    {item.finame && <div style={{fontSize:10,color:'#888',marginTop:1}}>FINAME: {item.finame}</div>}
+                  </div>
+                </div>
+              ))}
+              {filteredCat.length === 0 && (
+                <div style={{gridColumn:'1/-1',textAlign:'center',padding:30,color:'#999'}}>
+                  Nenhum produto encontrado para os filtros selecionados.
+                </div>
+              )}
+            </div>
+            <div style={{fontSize:12,color:'#888',marginTop:8,textAlign:'right'}}>{filteredCat.length} produto(s) encontrado(s) de {ALL_CATALOG.length} no catálogo</div>
+            <div className="btn-group"><button className="btn btn-outline" onClick={()=>setShowCatalog(null)}>Fechar</button></div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============ HISTORICO ============
+function HistoricoTab({proposals, sellers, onEdit, onDelete, onStatusChange, onPDF, filterStatus, setFilterStatus, filterSearch, setFilterSearch}) {
+  const getModels = (p) => (p.items||[]).map(i=>i.model).filter(Boolean).join(' + ') || p.model || '';
+  const getTotalValue = (p) => {
+    if (p.items && p.items.length > 0)
+      return p.items.reduce((s,i)=>s+Math.max(0,parseCurrency(i.totalValue)-(i.tradeIns||[]).reduce((ss,t)=>ss+parseCurrency(t.value),0)),0);
+    return parseCurrency(p.totalValue);
+  };
+
+  const filtered = proposals.filter(p => {
+    const matchStatus = !filterStatus || p.status===filterStatus || (!p.status && filterStatus==='aguardando');
+    const models = getModels(p);
+    const matchSearch = !filterSearch || p.clientName?.toLowerCase().includes(filterSearch.toLowerCase()) ||
+      models.toLowerCase().includes(filterSearch.toLowerCase()) || p.num?.toLowerCase().includes(filterSearch.toLowerCase());
+    return matchStatus && matchSearch;
+  });
+
+  const getStatusInfo = (status) => STATUS_OPTIONS.find(s=>s.value===status) || STATUS_OPTIONS[0];
+
+  return (
+    <div>
+      <div className="filter-bar">
+        <input value={filterSearch} onChange={e=>setFilterSearch(e.target.value)} placeholder="🔍 Buscar cliente, modelo ou Nº..." />
+        <select value={filterStatus} onChange={e=>setFilterStatus(e.target.value)}>
+          <option value="">Todos os Status</option>
+          {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+        </select>
+      </div>
+
+      {filtered.length === 0 ? (
+        <div className="card"><div className="empty"><div className="empty-icon">📋</div><div>Nenhuma proposta encontrada.</div></div></div>
+      ) : filtered.map(p => {
+        const si = getStatusInfo(p.status);
+        const seller = sellers.find(s=>s.id===p.sellerId);
+        return (
+          <div key={p.id} className="proposal-item">
+            <div className="proposal-main">
+              <div className="proposal-num">{p.num} · {seller?.name?.split(' ')[0]||''} · {fmtDate(p.date)}</div>
+              <div className="proposal-client">{p.clientName || 'Cliente não informado'}</div>
+              <div className="proposal-product">{getModels(p) || 'GTS do Brasil'}</div>
+              <div className="proposal-meta">
+                <span className={`status ${si.color}`}>{si.label}</span>
+                {getTotalValue(p) > 0 && <span style={{marginLeft:8,fontSize:11,fontWeight:700}}>{fmtCurrency(getTotalValue(p))}</span>}
+                {(p.items||[]).length > 1 && <span style={{marginLeft:8,fontSize:11,color:'var(--verde)',fontWeight:600}}>{p.items.length} itens</span>}
+              </div>
+            </div>
+            <div className="proposal-actions">
+              <button className="btn btn-outline btn-sm" onClick={()=>onStatusChange(p)} title="Alterar Status">🔄</button>
+              <button className="btn btn-secondary btn-sm" onClick={()=>onPDF(p)} title="Gerar PDF">📄</button>
+              <button className="btn btn-outline btn-sm" onClick={()=>onEdit(p)} title="Editar">✏️</button>
+              <button className="btn btn-danger btn-sm" onClick={()=>onDelete(p.id)} title="Excluir">🗑️</button>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ============ CATALOGO ============
+function CatalogoTab() {
+  const [catFilter, setCatFilter] = useState('');
+  const [brandFilter, setBrandFilter] = useState('');
+  const brands = [...new Set(ALL_CATALOG.map(i=>i.brand))];
+  const cats = [...new Set(ALL_CATALOG.filter(i=>!brandFilter||i.brand===brandFilter).map(i=>i.cat))];
+  const filtered = ALL_CATALOG.filter(item => {
+    const matchBrand = !brandFilter || item.brand === brandFilter;
+    const matchCat = !catFilter || item.cat === catFilter;
+    return matchBrand && matchCat;
+  });
+
+  return (
+    <div>
+      {/* Brand tabs */}
+      <div style={{display:'flex',gap:8,marginBottom:12,flexWrap:'wrap',alignItems:'center'}}>
+        <button onClick={()=>{setBrandFilter('');setCatFilter('');}}
+          className={`btn btn-sm ${!brandFilter?'btn-primary':'btn-outline'}`}>
+          🌐 Todos ({ALL_CATALOG.length})
+        </button>
+        {brands.map(b => (
+          <button key={b} onClick={()=>{setBrandFilter(b);setCatFilter('');}}
+            className={`btn btn-sm ${brandFilter===b?'btn-primary':'btn-outline'}`}>
+            {b === 'Jan' ? '🔴' : '🟢'} {b} ({ALL_CATALOG.filter(i=>i.brand===b).length})
+          </button>
+        ))}
+      </div>
+
+      {/* Category filter */}
+      <div style={{marginBottom:12}}>
+        <select value={catFilter} onChange={e=>setCatFilter(e.target.value)} style={{width:'100%'}}>
+          <option value="">Todas as Categorias  -  {filtered.length} produto(s)</option>
+          {cats.map(c => <option key={c} value={c}>{c} ({ALL_CATALOG.filter(i=>i.cat===c&&(!brandFilter||i.brand===brandFilter)).length})</option>)}
+        </select>
+      </div>
+
+      <div className="catalog-grid">
+        {filtered.map(item => (
+          <div key={item.id||item.name} className="catalog-item" style={{cursor:'default'}}>
+            {item.img ? (
+              <img src={item.img} alt={item.name} style={{width:'100%',height:110,objectFit:'cover',borderRadius:6,marginBottom:10,backgroundColor:'#eee'}}
+                onError={e=>{e.target.style.display='none';}} />
+            ) : (
+              <div style={{width:'100%',height:110,background:item.brand==='Jan'?'linear-gradient(135deg,#3a1a1a,#8b2020)':'linear-gradient(135deg,#1a3a1a,#2d6a2d)',borderRadius:6,marginBottom:10,display:'flex',alignItems:'center',justifyContent:'center',fontSize:32}}>
+                {item.brand==='Jan'?'🔴':'🟢'}
+              </div>
+            )}
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:2}}>
+              <div className="catalog-cat">{item.cat}</div>
+              <span style={{fontSize:10,fontWeight:700,color:item.brand==='Jan'?'#c0392b':'#2d6a2d',background:item.brand==='Jan'?'#fde8e8':'#eafaea',padding:'2px 6px',borderRadius:4}}>{item.brand}</span>
+            </div>
+            <div className="catalog-name" style={{fontSize:16}}>{item.name}</div>
+            <div className="catalog-desc" style={{marginTop:4}}>{item.desc}</div>
+            {(item.finame || item.ncm) && (
+              <div style={{marginTop:8,padding:'6px 8px',background:'#f0f7f0',borderRadius:4}}>
+                {item.finame && <div style={{fontSize:10,fontWeight:700,color:'#2d6a2d'}}>FINAME: {item.finame}</div>}
+                {item.ncm && <div style={{fontSize:10,fontWeight:700,color:'#2d6a2d'}}>NCM: {item.ncm}</div>}
+              </div>
+            )}
+          </div>
+        ))}
+        {filtered.length === 0 && (
+          <div style={{gridColumn:'1/-1',textAlign:'center',padding:40,color:'#999'}}>
+            <div style={{fontSize:32,marginBottom:8}}>🔍</div>
+            Nenhum produto encontrado.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.render(<App />, document.getElementById('root'));
+</script>
+</body>
+</html>
