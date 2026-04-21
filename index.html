@@ -1261,8 +1261,8 @@ function App() {
   const [syncMsg, setSyncMsg] = useState('');
   const [showGhConfig, setShowGhConfig] = useState(false);
   const [ghToken, setGhToken] = useState(() => localStorage.getItem('gh_token') || '');
-  const [ghOwner, setGhOwner] = useState(() => localStorage.getItem('gh_owner') || '');
-  const [ghRepo, setGhRepo] = useState(() => localStorage.getItem('gh_repo') || '');
+  const [ghOwner, setGhOwner] = useState(() => localStorage.getItem('gh_owner') || 'centrooesteimplementos');
+  const [ghRepo, setGhRepo] = useState(() => localStorage.getItem('gh_repo') || 'centro-oeste-propostas');
   const fileSha = useRef(null);
   const syncTimer = useRef(null);
 
@@ -1429,23 +1429,20 @@ function App() {
             <p style={{fontSize:12,color:'#666',marginBottom:16,lineHeight:1.5}}>
               As propostas serão salvas automaticamente em um repositório GitHub, permitindo acesso de qualquer dispositivo.
             </p>
+            <div style={{background:'#f0f7f0',border:'1px solid #c3dfc3',borderRadius:6,padding:'10px 14px',marginBottom:14,fontSize:12,color:'#2d6a2d'}}>
+              Repositório: <b>github.com/centrooesteimplementos/centro-oeste-propostas</b>
+            </div>
             <div className="gh-field">
               <label>Token de Acesso Pessoal (PAT)</label>
               <input type="password" value={ghToken} onChange={e=>setGhToken(e.target.value)}
-                placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" />
-              <div className="gh-help">Gere em: GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens (permissão: Contents read/write)</div>
-            </div>
-            <div className="gh-field">
-              <label>Usuário ou Organização GitHub</label>
-              <input value={ghOwner} onChange={e=>setGhOwner(e.target.value)} placeholder="seu-usuario" />
-            </div>
-            <div className="gh-field">
-              <label>Nome do Repositório</label>
-              <input value={ghRepo} onChange={e=>setGhRepo(e.target.value)} placeholder="centro-oeste-propostas" />
+                placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autoFocus />
+              <div className="gh-help">
+                Gere em: <b>github.com</b> → Settings → Developer settings → Personal access tokens → Tokens (classic) → marque <b>repo</b>
+              </div>
             </div>
             <hr className="gh-divider" />
             <div style={{fontSize:11,color:'#888',marginBottom:14}}>
-              Os dados ficam em <code>data/proposals.json</code> no repositório. O Token fica salvo apenas neste navegador.
+              O token fica salvo apenas neste navegador. Os dados ficam em <code>data/proposals.json</code> no repositório.
             </div>
             <div className="btn-group">
               <button className="btn btn-primary" onClick={saveGhConfig} disabled={!ghToken||!ghOwner||!ghRepo}>
