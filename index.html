@@ -1283,6 +1283,8 @@ function App() {
   const [showStatusModal, setShowStatusModal] = useState(null);
   const [syncStatus, setSyncStatus] = useState('idle');
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('darkMode') === '1');
+  const [showChangePwd, setShowChangePwd] = useState(false);
+  const [forcePwdNotice, setForcePwdNotice] = useState('');
   const unsubProposals = useRef(null);
   const unsubUsers = useRef(null);
 
@@ -1299,8 +1301,17 @@ function App() {
         try {
           const doc = await db.collection('users').doc(user.uid).get();
           if (doc.exists && doc.data().active !== false) {
+            const data = doc.data();
+            if (data.forcePassword) {
+              try {
+                await user.updatePassword(data.forcePassword);
+                await db.collection('users').doc(user.uid).update({ forcePassword: firebase.firestore.FieldValue.delete() });
+                setForcePwdNotice('Sua senha foi redefinida pelo administrador. Troque-a agora se desejar.');
+                setShowChangePwd(true);
+              } catch(e) { console.error('forcePassword apply error', e); }
+            }
             setCurrentUser(user);
-            setUserProfile({ id: user.uid, ...doc.data() });
+            setUserProfile({ id: user.uid, ...data });
           } else {
             await auth.signOut();
             setCurrentUser(null); setUserProfile(null);
@@ -1382,6 +1393,7 @@ function App() {
             {darkMode ? '☀️ Claro' : '🌙 Escuro'}
           </button>
           <span className={`role-badge role-${role}`}>{ROLE_LABELS[role]}</span>
+          <button className="btn btn-sm btn-outline" style={{fontSize:11,padding:'4px 8px'}} onClick={()=>{ setForcePwdNotice(''); setShowChangePwd(true); }} title="Trocar senha">🔑 Senha</button>
           <div className="nav-seller" onClick={()=>auth.signOut()} title="Clique para sair">
             <div className={`nav-seller-icon user-avatar-${role}`}>{userProfile.initials}</div>
             <div className="nav-seller-name">{userProfile.name.split(' ')[0]}</div>
@@ -1415,6 +1427,7 @@ function App() {
         {tab==='catalogo' && <CatalogoTab />}
         {tab==='admin' && role==='admin' && <AdminPanel currentUserId={currentUser.uid} />}
       </div>
+      {showChangePwd && <ChangePwdModal notice={forcePwdNotice} onClose={()=>setShowChangePwd(false)} />}
       {showStatusModal && (
         <div className="modal-overlay" onClick={()=>setShowStatusModal(null)}>
           <div className="modal" onClick={e=>e.stopPropagation()}>
@@ -1433,6 +1446,80 @@ function App() {
     </div>
   );
 }
+// ============ TROCAR SENHA ============
+function ChangePwdModal({ notice, onClose }) {
+  const [newPwd, setNewPwd] = useState('');
+  const [confirmPwd, setConfirmPwd] = useState('');
+  const [currentPwd, setCurrentPwd] = useState('');
+  const [needReauth, setNeedReauth] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
+
+  const submit = async (e) => {
+    e.preventDefault();
+    if (newPwd !== confirmPwd) { setError('As senhas não coincidem.'); return; }
+    if (newPwd.length < 6) { setError('A senha deve ter ao menos 6 caracteres.'); return; }
+    setLoading(true); setError('');
+    try {
+      if (needReauth) {
+        const user = auth.currentUser;
+        const cred = firebase.auth.EmailAuthProvider.credential(user.email, currentPwd);
+        await user.reauthenticateWithCredential(cred);
+      }
+      await auth.currentUser.updatePassword(newPwd);
+      setSuccess(true);
+    } catch(err) {
+      if (err.code === 'auth/requires-recent-login') {
+        setNeedReauth(true);
+        setError('Sessão expirada. Digite sua senha atual para confirmar.');
+      } else if (err.code === 'auth/wrong-password') {
+        setError('Senha atual incorreta.');
+      } else {
+        setError('Erro: ' + (err.message || 'tente novamente.'));
+      }
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={e=>e.stopPropagation()}>
+        <div className="modal-title">🔑 Trocar Senha</div>
+        {notice && <div style={{padding:'10px 14px',background:'#fff3cd',color:'#856404',borderRadius:6,fontSize:13,marginBottom:16}}>{notice}</div>}
+        {success ? (
+          <>
+            <div style={{padding:'12px 16px',background:'#d1e7dd',color:'#0f5132',borderRadius:6,fontSize:13,marginBottom:16}}>Senha alterada com sucesso!</div>
+            <button className="btn btn-primary" style={{width:'100%'}} onClick={onClose}>Fechar</button>
+          </>
+        ) : (
+          <form onSubmit={submit}>
+            {needReauth && (
+              <div className="form-group" style={{marginBottom:12}}>
+                <label>Senha Atual</label>
+                <input type="password" value={currentPwd} onChange={e=>setCurrentPwd(e.target.value)} required autoFocus placeholder="••••••••" />
+              </div>
+            )}
+            <div className="form-group" style={{marginBottom:12}}>
+              <label>Nova Senha</label>
+              <input type="password" value={newPwd} onChange={e=>setNewPwd(e.target.value)} required autoFocus={!needReauth} placeholder="Mínimo 6 caracteres" />
+            </div>
+            <div className="form-group" style={{marginBottom:20}}>
+              <label>Confirmar Nova Senha</label>
+              <input type="password" value={confirmPwd} onChange={e=>setConfirmPwd(e.target.value)} required placeholder="Repita a nova senha" />
+            </div>
+            {error && <div className="login-error" style={{marginBottom:12}}>{error}</div>}
+            <div className="btn-group">
+              <button type="submit" className="btn btn-primary" disabled={loading}>{loading ? 'Salvando...' : 'Salvar Nova Senha'}</button>
+              <button type="button" className="btn btn-outline" onClick={onClose}>Cancelar</button>
+            </div>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ============ LOGIN ============
 function LoginScreen({ logoB64, darkMode, setDarkMode }) {
   const [username, setUsername] = useState('');
@@ -1561,6 +1648,8 @@ function AdminPanel({ currentUserId }) {
   const [resetTarget, setResetTarget] = useState(null);
   const [resetLoading, setResetLoading] = useState(false);
   const [resetMsg, setResetMsg] = useState('');
+  const [resetNewPwd, setResetNewPwd] = useState('');
+  const [resetConfirmPwd, setResetConfirmPwd] = useState('');
 
   useEffect(() => {
     const unsub = db.collection('users').orderBy('name').onSnapshot(snap => {
@@ -1607,14 +1696,17 @@ function AdminPanel({ currentUserId }) {
     await db.collection('users').doc(userId).update({ role: newRole });
   };
 
-  const sendAdminReset = async () => {
+  const sendAdminReset = async (e) => {
+    e.preventDefault();
     if (!resetTarget) return;
+    if (resetNewPwd !== resetConfirmPwd) { setResetMsg('erro:As senhas não coincidem.'); return; }
+    if (resetNewPwd.length < 6) { setResetMsg('erro:Mínimo 6 caracteres.'); return; }
     setResetLoading(true); setResetMsg('');
     try {
-      await auth.sendPasswordResetEmail(resetTarget.email);
-      setResetMsg('Email enviado para ' + resetTarget.email);
+      await db.collection('users').doc(resetTarget.id).update({ forcePassword: resetNewPwd });
+      setResetMsg('ok:Senha definida! Será aplicada no próximo login de ' + resetTarget.name + '.');
     } catch(err) {
-      setResetMsg('Erro: ' + (err.message || 'tente novamente.'));
+      setResetMsg('erro:Erro: ' + (err.message || 'tente novamente.'));
     }
     setResetLoading(false);
   };
@@ -1666,27 +1758,31 @@ function AdminPanel({ currentUserId }) {
         {users.length===0 && <div style={{textAlign:'center',padding:30,color:'#999'}}>Nenhum usuário cadastrado.</div>}
       </div>
       {resetTarget && (
-        <div className="modal-overlay" onClick={()=>{ setResetTarget(null); setResetMsg(''); }}>
+        <div className="modal-overlay" onClick={()=>{ setResetTarget(null); setResetMsg(''); setResetNewPwd(''); setResetConfirmPwd(''); }}>
           <div className="modal" onClick={e=>e.stopPropagation()}>
-            <div className="modal-title">🔑 Reset de Senha</div>
-            {!resetMsg ? (
+            <div className="modal-title">🔑 Redefinir Senha</div>
+            <p style={{fontSize:13,color:'var(--text2)',marginBottom:16}}>Usuário: <b>{resetTarget.name}</b></p>
+            {resetMsg.startsWith('ok:') ? (
               <>
-                <p style={{fontSize:13,color:'var(--text2)',marginBottom:8}}>Usuário: <b>{resetTarget.name}</b></p>
-                <p style={{fontSize:13,color:'var(--text2)',marginBottom:20}}>Um email de recuperação será enviado para:<br/><b>{resetTarget.email}</b></p>
-                <div className="btn-group">
-                  <button className="btn btn-primary" onClick={sendAdminReset} disabled={resetLoading}>
-                    {resetLoading ? 'Enviando...' : 'Enviar Email de Recuperação'}
-                  </button>
-                  <button className="btn btn-outline" onClick={()=>{ setResetTarget(null); setResetMsg(''); }}>Cancelar</button>
-                </div>
+                <div style={{padding:'12px 16px',background:'#d1e7dd',color:'#0f5132',borderRadius:6,fontSize:13,marginBottom:16}}>{resetMsg.slice(3)}</div>
+                <button className="btn btn-outline" style={{width:'100%'}} onClick={()=>{ setResetTarget(null); setResetMsg(''); setResetNewPwd(''); setResetConfirmPwd(''); }}>Fechar</button>
               </>
             ) : (
-              <>
-                <div style={{padding:'12px 16px',background: resetMsg.startsWith('Erro') ? '#fde8e8' : '#d1e7dd', color: resetMsg.startsWith('Erro') ? '#8b0000' : '#0f5132',borderRadius:6,fontSize:13,marginBottom:16}}>
-                  {resetMsg}
+              <form onSubmit={sendAdminReset}>
+                <div className="form-group" style={{marginBottom:12}}>
+                  <label>Nova Senha</label>
+                  <input type="password" value={resetNewPwd} onChange={e=>setResetNewPwd(e.target.value)} required autoFocus minLength={6} placeholder="Mínimo 6 caracteres" />
                 </div>
-                <button className="btn btn-outline" style={{width:'100%'}} onClick={()=>{ setResetTarget(null); setResetMsg(''); }}>Fechar</button>
-              </>
+                <div className="form-group" style={{marginBottom:20}}>
+                  <label>Confirmar Nova Senha</label>
+                  <input type="password" value={resetConfirmPwd} onChange={e=>setResetConfirmPwd(e.target.value)} required placeholder="Repita a senha" />
+                </div>
+                {resetMsg.startsWith('erro:') && <div className="login-error" style={{marginBottom:12}}>{resetMsg.slice(5)}</div>}
+                <div className="btn-group">
+                  <button type="submit" className="btn btn-primary" disabled={resetLoading}>{resetLoading ? 'Salvando...' : 'Definir Nova Senha'}</button>
+                  <button type="button" className="btn btn-outline" onClick={()=>{ setResetTarget(null); setResetMsg(''); setResetNewPwd(''); setResetConfirmPwd(''); }}>Cancelar</button>
+                </div>
+              </form>
             )}
           </div>
         </div>
