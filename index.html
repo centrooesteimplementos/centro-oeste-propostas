@@ -886,12 +886,18 @@ const generatePDF = async (proposal, seller, logoB64) => {
   }
   doc.setTextColor(255,255,255);
   doc.setFont('helvetica','bold');
-  doc.setFontSize(9);
-  doc.text('CENTRO OESTE IMPLEMENTOS', marginR, 14, { align:'right' });
-  doc.setFont('helvetica','normal');
   doc.setFontSize(8);
-  doc.text('Mato Grosso - Brasil', marginR, 19, { align:'right' });
-  doc.text(`Vendedor: ${seller?.name || ''}`, marginR, 24, { align:'right' });
+  doc.text('CENTRO OESTE IMPLEMENTOS AGRICOLAS LTDA', marginR, 10, { align:'right' });
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(6.5);
+  doc.text('CNPJ: 39.834.512/0001-99', marginR, 15, { align:'right' });
+  doc.text('Av. Vitória Régia, 543 W, Sala 03 - Bandeirantes', marginR, 20, { align:'right' });
+  doc.text('Lucas do Rio Verde - MT  |  CEP: 78.455-000', marginR, 25, { align:'right' });
+  doc.text('(65) 9633-3114 / (65) 9949-4755', marginR, 30, { align:'right' });
+  doc.text('financeiro@centroosteimplementos.com.br', marginR, 35, { align:'right' });
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(7);
+  doc.text(`Vendedor: ${seller?.name || ''}`, marginR, 40, { align:'right' });
   doc.setFillColor(45,106,45);
   doc.rect(0, 42, W, 12, 'F');
   doc.setTextColor(255,255,255);
@@ -913,9 +919,9 @@ const generatePDF = async (proposal, seller, logoB64) => {
   doc.setTextColor(26,26,26);
   doc.setFontSize(9);
   const clientRows = [
-    [`Cliente: ${proposal.clientName||''}`, `${(proposal.docTipo==='cnpj'?'CNPJ':'CPF')}: ${proposal.cpf||''}`],
-    [`Telefone: ${proposal.phone||''}`, `Fazenda: ${proposal.farm||''}`],
-    [`Cidade: ${proposal.city||''}${proposal.estado?' - '+proposal.estado:''}`, `Validade: ${fmtDate(proposal.validUntil)||'A definir'}`],
+    [`Cliente: ${(proposal.clientName||'').toUpperCase()}`, `${(proposal.docTipo==='cnpj'?'CNPJ':'CPF')}: ${proposal.cpf||''}`],
+    [`Telefone: ${(proposal.phone||'').toUpperCase()}`, `Fazenda: ${(proposal.farm||'').toUpperCase()}`],
+    [`Cidade: ${(proposal.city||'').toUpperCase()}${proposal.estado?' - '+proposal.estado.toUpperCase():''}`, `Validade: ${fmtDate(proposal.validUntil)||'A definir'}`],
   ];
   clientRows.forEach(row => {
     doc.setFont('helvetica','bold');
@@ -945,7 +951,7 @@ const generatePDF = async (proposal, seller, logoB64) => {
     doc.setTextColor(26,26,26);
     const prodRows = [
       [`Marca: ${item.brand||'GTS do Brasil'}`, `Modelo: ${item.model||''}`],
-      [`Cód. FINAME: ${item.finame||''}`, `NCM: ${item.ncm||''}`],
+      [`Cód. FINAME: `, `NCM: ${item.ncm||''}`],
       [`Produto: ${item.product||''}`, `Prazo de Entrega: ${item.deliveryTime||'A definir'}`],
     ];
     prodRows.forEach(row => {
@@ -1223,7 +1229,7 @@ const generatePDF = async (proposal, seller, logoB64) => {
     doc.setTextColor(26,26,26);
     doc.setFont('helvetica','normal');
     doc.setFontSize(8.5);
-    const noteLines = doc.splitTextToSize(proposal.notes.trim(), 178);
+    const noteLines = doc.splitTextToSize(proposal.notes.trim().toUpperCase(), 178);
     const noteH = noteLines.length * 5 + 4;
     y = checkBreak(y, noteH);
     doc.text(noteLines, marginL, y+4);
@@ -1242,6 +1248,19 @@ const generatePDF = async (proposal, seller, logoB64) => {
   doc.text('Assinatura do Vendedor', marginL, y+5);
   doc.text('Assinatura do Cliente', 105, y+5);
   doc.text(seller?.name || '', marginL, y+10);
+  y += 18;
+  doc.setDrawColor(200,200,200);
+  doc.line(marginL, y, marginR, y);
+  y += 4;
+  doc.setTextColor(26,26,26);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(7.5);
+  doc.text('CENTRO OESTE IMPLEMENTOS AGRICOLAS LTDA', marginL, y);
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(7);
+  doc.text('CNPJ: 39.834.512/0001-99', marginL, y+5);
+  doc.text('Av. Vitória Régia, 543 W, Sala 03 - Bandeirantes  |  Lucas do Rio Verde - MT  |  CEP: 78.455-000', marginL, y+10);
+  doc.text('Tel: (65) 9633-3114 / (65) 9949-4755  |  financeiro@centroosteimplementos.com.br', marginL, y+15);
 
   // ---- RODAPÉ EM TODAS AS PÁGINAS ----
   drawFooter();
@@ -1389,7 +1408,7 @@ function App() {
         {tab==='historico' && <HistoricoTab proposals={proposals} sellers={sellers}
           onEdit={p=>{setEditProposal(p);setTab('nova');}} onDelete={deleteProposal}
           onStatusChange={p=>setShowStatusModal(p)}
-          onPDF={p=>{ const s=users.find(x=>x.id===p.sellerId)||userProfile; generatePDF(p,s,LOGO_BRANCA_B64); }}
+          onPDF={p=>{ const s=users.find(x=>x.id===p.sellerId)||userProfile; generatePDF(p,s,LOGO_PRETA_B64); }}
           filterStatus={filterStatus} setFilterStatus={setFilterStatus}
           filterSearch={filterSearch} setFilterSearch={setFilterSearch} />}
         {tab==='catalogo' && <CatalogoTab />}
@@ -1802,7 +1821,7 @@ function ProposalForm({proposal, sellers, currentSeller, userRole, proposals, on
     setPdfLoading(true);
     try {
       const s = sellers.find(x=>x.id===form.sellerId)||currentSeller;
-      await generatePDF(form, s, LOGO_BRANCA_B64);
+      await generatePDF(form, s, LOGO_PRETA_B64);
     } finally {
       setPdfLoading(false);
     }
